@@ -8,11 +8,12 @@ struct Args {
   double constant;
   vector<string> dms;
 
-  bool octal;
+  bool octal, expand;
 
   Args(int argc, char** argv) {
     constant = 0;
     octal = false;
+    expand = false;
     for (int i = 1; i < argc; i++) {
       string arg(argv[i]);
       if (arg == "-i" || arg == "--input") {
@@ -48,6 +49,10 @@ struct Args {
 
       else if (arg == "-c") {
         octal=true;
+      }
+
+      else if (arg == "-e") {
+        expand=true;
       }
 
 

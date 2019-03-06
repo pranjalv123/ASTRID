@@ -1,9 +1,11 @@
 #include "DistanceMethods.hpp"
 #include "Args.hpp"
 #include "octal.hpp"
+#include "expand.hpp"
 #include <newick.hpp>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 
 TaxonSet get_ts(vector<string> newicks){
   unordered_set<string> taxa;
@@ -17,15 +19,22 @@ TaxonSet get_ts(vector<string> newicks){
   return ts;
 
  }
-DistanceMatrix get_distance_matrix(TaxonSet& ts, vector<string> newicks, vector<double> weights, vector<Clade>& tree_taxa) {
+
+DistanceMatrix get_distance_matrix(TaxonSet& ts, vector<string> newicks, vector<double> weights, vector<Clade>& tree_taxa, bool expand, string guide_tree) {
+  DistanceMatrix guide_dm(ts);
+  if (expand && guide_tree.size()) {
+      guide_dm = DistanceMatrix(ts, guide_tree);
+      cout << "GOT GUIDE DM" << endl;
+    }
 
   DistanceMatrix result(ts);
   for (size_t i = 0; i < newicks.size(); i++) {
     string& n = newicks[i];
     double w  = weights[i];
 
-
     DistanceMatrix dm(ts, n);
+
+
     if (tree_taxa.size() > i) {
       for (Taxon t1 : ts) {
         for (Taxon t2 : ts) {
@@ -38,18 +47,23 @@ DistanceMatrix get_distance_matrix(TaxonSet& ts, vector<string> newicks, vector<
     }
 
     dm *= w;
+
+
+    if (expand) {
+      do_expand(dm, ts, tree_taxa[i], guide_tree, guide_dm);
+    }
+
+
     result += dm;
 
   }
 
   for (int i = 0; i < ts.size(); i++) {
     for (int j = i; j < ts.size(); j++) {
-        //cout << result(i,j) << "," << result.masked(i,j) << "\t";
         if (result.masked(i,j))
           result(i,j) /= result.masked(i,j);
     }
   }
-//  cout << endl;
 
   return result;
 
@@ -57,11 +71,16 @@ DistanceMatrix get_distance_matrix(TaxonSet& ts, vector<string> newicks, vector<
 
 DistanceMatrix get_distance_matrix(TaxonSet& ts, vector<string> newicks) {
   vector<Clade> vc;
-  return get_distance_matrix(ts, newicks, vector<double>(newicks.size(), 1), vc);
+  return get_distance_matrix(ts, newicks, vector<double>(newicks.size(), 1), vc, false, "");
 }
 
+DistanceMatrix get_distance_matrix(TaxonSet& ts, vector<string> newicks, vector<Clade>& tree_taxa, bool expand, string guide_tree) {
+  return get_distance_matrix(ts, newicks, vector<double>(newicks.size(), 1), tree_taxa, expand, guide_tree);
+}
+
+
 DistanceMatrix get_distance_matrix(TaxonSet& ts, vector<string> newicks, vector<Clade>& tree_taxa) {
-  return get_distance_matrix(ts, newicks, vector<double>(newicks.size(), 1), tree_taxa);
+  return get_distance_matrix(ts, newicks, vector<double>(newicks.size(), 1), tree_taxa, false, "");
 }
 
 string run_astrid(vector<string> newicks) {
@@ -138,6 +157,17 @@ int main(int argc, char** argv) {
       }
       dm = get_distance_matrix(ts, input_trees, tree_taxa);
 
+    }
+
+    if (tree.size() && args.expand) {
+
+      vector<string> completed_trees;
+      vector<Clade>  tree_taxa;
+      for (string t_s : input_trees) {
+        Tree t = newick_to_treeclades(t_s, ts);
+        tree_taxa.push_back(t.taxa());
+      }
+      dm = get_distance_matrix(ts, input_trees, tree_taxa, true, tree);
     }
 
     if (iter > 1) {
