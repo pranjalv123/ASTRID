@@ -40,6 +40,9 @@ struct Args {
       else if (arg == "-s") {
         dms.push_back("fastme_spr");
       }
+      else if (arg == "--bionj") {
+        dms.push_back("bionj");
+      }
 
       else if (arg == "-x") {
         constant = atof(argv[i+1]);
@@ -53,14 +56,18 @@ struct Args {
 
     }
     if (infile == "") {
-        cerr << "Input file required";
+      cerr << "Input file required" << endl;;
         exit(1);
     }
     if (outfile == "") {
       outfile = infile + ".astrid";
     }
 
+    if (dms.empty()) {
+      dms.push_back("auto");
+    }
   }
+  
 };
 
 

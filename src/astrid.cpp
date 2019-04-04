@@ -4,8 +4,21 @@
 #include <newick.hpp>
 #include <iostream>
 #include <fstream>
+#include "util/Logger.hpp"
 
-TaxonSet get_ts(vector<string> newicks){
+
+bool has_missing(TaxonSet& ts, DistanceMatrix& dm) {
+  for (size_t i = 0; i < ts.size(); i++) {
+    for (size_t j = i+1; j < ts.size(); j++) {
+      if ( ! dm.has(i, j) ) {
+	return true;
+      }
+    }
+  }
+  return false;
+}
+
+TaxonSet get_ts(vector<string>& newicks){
   unordered_set<string> taxa;
   for (string n : newicks) {
     newick_to_ts(n, taxa);
@@ -100,27 +113,43 @@ void fill_in(TaxonSet& ts, DistanceMatrix& dm, string tree) {
 
 }
 
+void progressbar(double pct) {
+  cerr << "[";
+  for (int i = 0; i < (int)(68 * pct); i++) {
+    cerr << "#";
+  }
+  for (int i = (int)(68 * pct); i < 68; i++) {
+    cerr << "-";
+  }
+  cerr << "]\r";
+}
+
 int main(int argc, char** argv) {
+  Logger::enable("PROGRESS");
   Args args(argc, argv);
   vector<string> input_trees;
 
   ifstream inf(args.infile);
 
   string buf;
+  PROGRESS << "Reading trees..." << endl;
   while(!inf.eof()) {
     getline(inf, buf);
     if (buf.size() > 3)
       input_trees.push_back(buf);
   }
-
+  PROGRESS << "Read " << input_trees.size() << " trees" << endl;
+  
   TaxonSet ts = get_ts(input_trees);
   int iter = 1;
   string tree;
+
+  
   DistanceMatrix dm = get_distance_matrix(ts, input_trees);
 
-
+  cerr << "Estimating tree" << endl;
   for (string method : args.dms) {
-    cout << "Running " << method << endl;
+    cerr << "Running " << method << endl;
 
     if (tree.size() && args.octal) {
 
@@ -146,8 +175,13 @@ int main(int argc, char** argv) {
       fill_in(ts, dm, args.constant);
     }
 
-
-    if (method == "upgma") {
+    if (method == "auto") {
+      if (has_missing(ts, dm)) {
+	tree = BioNJStar(ts, dm);
+      } else {
+	tree = FastME(ts, dm, 1, 1);
+      }
+    } else if (method == "upgma") {
       tree = UPGMA(ts, dm);
     } else if (method == "fastme") {
       tree = FastME(ts, dm, 0, 0);
@@ -155,6 +189,8 @@ int main(int argc, char** argv) {
       tree = FastME(ts, dm, 1, 0);
     } else if (method == "fastme_spr") {
       tree = FastME(ts, dm, 1, 1);
+    } else if (method == "bionj") {
+      tree = BioNJStar(ts, dm);
     }
 
     ofstream outfile(args.outfile + "." + to_string(iter));

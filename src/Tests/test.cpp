@@ -1,6 +1,7 @@
 #include "catch.hpp"
 #include <newick.hpp>
 #include "../octal.hpp"
+#include "../Args.hpp"
 
 
 TEST_CASE("OCTAL") {
@@ -27,4 +28,22 @@ TEST_CASE("OCTAL") {
   cout << t2 << endl;
   REQUIRE(t1_orig.RFDist(t1) == 0);
   REQUIRE(t1_orig.RFDist(t2, false) == t1.RFDist(t2, false));
+}
+
+
+TEST_CASE("ARGS") {
+  char* argv[] = {"ASTRID", "-i", "inputfile", "-o", "outputfile", "-u", "-f", "-n", "-s", "-x", "2.3"};
+  Args args(sizeof(argv)/sizeof(*argv), argv);
+  
+  REQUIRE(args.infile == "inputfile");
+  REQUIRE(args.outfile == "outputfile");
+  REQUIRE(args.constant == 2.3);
+  REQUIRE(args.dms.size() == 4);
+  REQUIRE(args.dms[0] == "upgma");
+  REQUIRE(args.dms[1] == "fastme");
+  REQUIRE(args.dms[2] == "fastme_nni");
+  REQUIRE(args.dms[3] == "fastme_spr");
+
+  REQUIRE(!args.octal);
+  
 }
