@@ -202,5 +202,5 @@ int main(int argc, char** argv) {
 
   cout <<  tree << endl;
 
-
+  return 0;
 }
