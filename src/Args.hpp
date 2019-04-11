@@ -1,6 +1,8 @@
 #ifndef ARGS_HPP
 #define ARGS_HPP
 
+#include "help.hpp"
+
 struct Args {
   string infile;
   string outfile;
@@ -57,11 +59,19 @@ struct Args {
         multindfile = argv[i+1];
 	i++;
       }
+      else if (arg == "-h" || arg == "--help") {
+	cerr << help << endl;
+	exit(1);
+      }
+      else {
+	cerr << "Unrecognized argument " << arg << endl;
+	exit(1);
+      }
 
 
     }
     if (infile == "") {
-      cerr << "Input file required" << endl;;
+      cerr << help << endl;;
         exit(1);
     }
     if (outfile == "") {
