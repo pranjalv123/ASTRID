@@ -4,7 +4,8 @@
 struct Args {
   string infile;
   string outfile;
-
+  string multindfile;
+  
   double constant;
   vector<string> dms;
 
@@ -51,6 +52,10 @@ struct Args {
 
       else if (arg == "-c") {
         octal=true;
+      }
+      else if (arg == "-a" || arg == "--multind") {
+        multindfile = argv[i+1];
+	i++;
       }
 
 

@@ -2,6 +2,7 @@
 #include <newick.hpp>
 #include "../octal.hpp"
 #include "../Args.hpp"
+#include "../multind.hpp"
 
 
 TEST_CASE("OCTAL") {
@@ -45,5 +46,65 @@ TEST_CASE("ARGS") {
   REQUIRE(args.dms[3] == "fastme_spr");
 
   REQUIRE(!args.octal);
+  
+}
+
+
+void verify_mapping(string mapfile, TaxonSet& indiv_ts) {
+  stringstream stream(mapfile);
+  IndSpeciesMapping mapping1(indiv_ts);
+  mapping1.load(stream);
+  REQUIRE(mapping1[indiv_ts["indiv1"]] == mapping1.species()["species1"]);
+  REQUIRE(mapping1[indiv_ts["indiv2"]] == mapping1.species()["species1"]);
+  REQUIRE(mapping1[indiv_ts["indiv3"]] == mapping1.species()["species2"]);  
+
+}
+
+TEST_CASE("IDENTIFY") {
+  TaxonSet indiv_ts(3);
+  indiv_ts.add("indiv1");
+  indiv_ts.add("indiv2");
+  indiv_ts.add("indiv3");
+
+  IndSpeciesMapping mapping(indiv_ts);
+
+  
+  string astridm_mapfile =
+    "indiv1 species1\n"
+    "indiv2 species1\n"
+    "indiv3 species2\n";
+  stringstream astridm_stream(astridm_mapfile);
+  
+  REQUIRE(mapping.identify(astridm_stream) == ASTRIDM);
+  verify_mapping(astridm_mapfile, indiv_ts);
+
+  string astral_mapfile_1 =
+    "species1 indiv1\n"
+    "species1 indiv2\n"
+    "species2 indiv3\n";
+  stringstream astral_stream_1(astral_mapfile_1);
+  
+  REQUIRE(mapping.identify(astral_stream_1) == ASTRAL);
+  verify_mapping(astral_mapfile_1, indiv_ts);
+  
+  
+  string astral_mapfile_2 =
+    "species1 indiv1 indiv2\n"
+    "species2 indiv3\n";
+  stringstream astral_stream_2(astral_mapfile_2);
+  
+  REQUIRE(mapping.identify(astral_stream_2) == ASTRAL);
+  verify_mapping(astral_mapfile_2, indiv_ts);
+  
+  
+  string astral_mapfile_3 =
+    "species1:indiv1, indiv2\n"
+    "species2:indiv3\n";
+  stringstream astral_stream_3(astral_mapfile_3);
+  
+  REQUIRE(mapping.identify(astral_stream_3) == ASTRAL);
+  verify_mapping(astral_mapfile_3, indiv_ts);
+  
+  
   
 }

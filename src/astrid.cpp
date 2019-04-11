@@ -1,4 +1,5 @@
 #include "DistanceMethods.hpp"
+#include "multind.hpp"
 #include "Args.hpp"
 #include "octal.hpp"
 #include <newick.hpp>
@@ -29,10 +30,15 @@ TaxonSet get_ts(vector<string>& newicks){
   }
   return ts;
 
- }
-DistanceMatrix get_distance_matrix(TaxonSet& ts, vector<string> newicks, vector<double> weights, vector<Clade>& tree_taxa) {
+}
 
+DistanceMatrix get_distance_matrix(TaxonSet& ts, vector<string> newicks, vector<double> weights, vector<Clade>& tree_taxa, IndSpeciesMapping* imap) {
+  
   DistanceMatrix result(ts);
+  if (imap) {
+    result = DistanceMatrix(imap->species());
+  }
+  
   for (size_t i = 0; i < newicks.size(); i++) {
     string& n = newicks[i];
     double w  = weights[i];
@@ -51,30 +57,34 @@ DistanceMatrix get_distance_matrix(TaxonSet& ts, vector<string> newicks, vector<
     }
 
     dm *= w;
+
+    if (imap) {
+      dm = imap->average(dm);
+    }
+    
     result += dm;
 
   }
 
-  for (int i = 0; i < ts.size(); i++) {
-    for (int j = i; j < ts.size(); j++) {
-        //cout << result(i,j) << "," << result.masked(i,j) << "\t";
+  for (size_t i = 0; i < ts.size(); i++) {
+    for (size_t j = i; j < ts.size(); j++) {
         if (result.masked(i,j))
           result(i,j) /= result.masked(i,j);
     }
   }
-//  cout << endl;
+
 
   return result;
 
 }
 
-DistanceMatrix get_distance_matrix(TaxonSet& ts, vector<string> newicks) {
+DistanceMatrix get_distance_matrix(TaxonSet& ts, vector<string> newicks, IndSpeciesMapping* imap) {
   vector<Clade> vc;
-  return get_distance_matrix(ts, newicks, vector<double>(newicks.size(), 1), vc);
+  return get_distance_matrix(ts, newicks, vector<double>(newicks.size(), 1), vc, imap);
 }
 
-DistanceMatrix get_distance_matrix(TaxonSet& ts, vector<string> newicks, vector<Clade>& tree_taxa) {
-  return get_distance_matrix(ts, newicks, vector<double>(newicks.size(), 1), tree_taxa);
+DistanceMatrix get_distance_matrix(TaxonSet& ts, vector<string> newicks, vector<Clade>& tree_taxa, IndSpeciesMapping* imap) {
+  return get_distance_matrix(ts, newicks, vector<double>(newicks.size(), 1), tree_taxa, imap);
 }
 
 string run_astrid(vector<string> newicks) {
@@ -100,7 +110,7 @@ void fill_in(TaxonSet& ts, DistanceMatrix& dm, double cval) {
 void fill_in(TaxonSet& ts, DistanceMatrix& dm, string tree) {
   vector<string> trees;
   trees.push_back(tree);
-  DistanceMatrix dm_tree = get_distance_matrix(ts, trees);
+  DistanceMatrix dm_tree = get_distance_matrix(ts, trees, NULL);
 
   for (size_t i = 0; i < ts.size(); i++) {
     for (size_t j = i; j < ts.size(); j++) {
@@ -126,9 +136,11 @@ void progressbar(double pct) {
 
 int main(int argc, char** argv) {
   Logger::enable("PROGRESS");
+  Logger::enable("ERROR"); 
   Args args(argc, argv);
-  vector<string> input_trees;
 
+  
+  vector<string> input_trees;
   ifstream inf(args.infile);
 
   string buf;
@@ -143,14 +155,23 @@ int main(int argc, char** argv) {
   TaxonSet ts = get_ts(input_trees);
   int iter = 1;
   string tree;
+ 
+
+  //Set up multi-individual mapping
+  IndSpeciesMapping* multind_mapping = nullptr;
+  if (args.multindfile.size()) {
+    multind_mapping = new IndSpeciesMapping(ts);
+    multind_mapping->load(args.multindfile);
+  }
 
   
-  DistanceMatrix dm = get_distance_matrix(ts, input_trees);
+  DistanceMatrix dm = get_distance_matrix(ts, input_trees, multind_mapping);
 
   cerr << "Estimating tree" << endl;
   for (string method : args.dms) {
     cerr << "Running " << method << endl;
 
+    //OCTAL completion of trees with missing data
     if (tree.size() && args.octal) {
 
       vector<string> completed_trees;
@@ -165,32 +186,42 @@ int main(int argc, char** argv) {
         ss << t;
         completed_trees.push_back(ss.str());
       }
-      dm = get_distance_matrix(ts, input_trees, tree_taxa);
+      dm = get_distance_matrix(ts, input_trees, multind_mapping);
 
     }
 
+    TaxonSet* species_ts = &ts;
+    if (multind_mapping) {
+      species_ts = &(multind_mapping->species());
+    } 
+    
+
+    //fill in missing elements on second and later iterations
     if (iter > 1) {
-      fill_in(ts, dm, tree);
+      fill_in(*species_ts, dm, tree);
     } else if (args.constant != 0) {
-      fill_in(ts, dm, args.constant);
+      fill_in(*species_ts, dm, args.constant);
     }
 
     if (method == "auto") {
-      if (has_missing(ts, dm)) {
-	tree = BioNJStar(ts, dm);
+      cout << dm.str() << endl;
+      if (has_missing(*species_ts, dm)) {
+	cerr << "Missing entries in distance matrix, running BioNJ*" << endl;
+	tree = BioNJStar(*species_ts, dm);
       } else {
-	tree = FastME(ts, dm, 1, 1);
+	cerr << "No missing entries in distance matrix, running FastME2+SPR" << endl;	
+	tree = FastME(*species_ts, dm, 1, 1);
       }
     } else if (method == "upgma") {
-      tree = UPGMA(ts, dm);
+      tree = UPGMA(*species_ts, dm);
     } else if (method == "fastme") {
-      tree = FastME(ts, dm, 0, 0);
+      tree = FastME(*species_ts, dm, 0, 0);
     } else if (method == "fastme_nni") {
-      tree = FastME(ts, dm, 1, 0);
+      tree = FastME(*species_ts, dm, 1, 0);
     } else if (method == "fastme_spr") {
-      tree = FastME(ts, dm, 1, 1);
+      tree = FastME(*species_ts, dm, 1, 1);
     } else if (method == "bionj") {
-      tree = BioNJStar(ts, dm);
+      tree = BioNJStar(*species_ts, dm);
     }
 
     ofstream outfile(args.outfile + "." + to_string(iter));
