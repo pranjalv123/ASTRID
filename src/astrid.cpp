@@ -204,7 +204,6 @@ int main(int argc, char** argv) {
     }
 
     if (method == "auto") {
-      cout << dm.str() << endl;
       if (has_missing(*species_ts, dm)) {
 	cerr << "Missing entries in distance matrix, running BioNJ*" << endl;
 	tree = BioNJStar(*species_ts, dm);
