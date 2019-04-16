@@ -1,7 +1,7 @@
 #ifndef HELP_HPP
 #define HELP_HPP
 
-string version="2.2";
+string version="2.2.1";
 
 string help = ""
   "********************************\n"
