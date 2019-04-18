@@ -206,7 +206,7 @@ int main(int argc, char** argv) {
     if (method == "auto") {
       if (has_missing(*species_ts, dm)) {
 	cerr << "Missing entries in distance matrix, running BioNJ*" << endl;
-	tree = BioNJStar(*species_ts, dm);
+	tree = BioNJStar(*species_ts, dm, args.java_opts);
       } else {
 	cerr << "No missing entries in distance matrix, running FastME2+SPR" << endl;	
 	tree = FastME(*species_ts, dm, 1, 1);
@@ -220,7 +220,7 @@ int main(int argc, char** argv) {
     } else if (method == "fastme_spr") {
       tree = FastME(*species_ts, dm, 1, 1);
     } else if (method == "bionj") {
-      tree = BioNJStar(*species_ts, dm);
+      tree = BioNJStar(*species_ts, dm, args.java_opts);
     }
 
     ofstream outfile(args.outfile + "." + to_string(iter));

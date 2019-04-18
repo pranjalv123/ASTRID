@@ -13,7 +13,7 @@ typedef set mySet;
 string FastME (TaxonSet& ts, DistanceMatrix& dm, int nni, int spr);
 
 
-string BioNJStar(TaxonSet& ts, DistanceMatrix& dm);
+string BioNJStar(TaxonSet& ts, DistanceMatrix& dm, vector<string>& java_opts);
 
 
 string NeighborJoining(DistanceMatrix& dm);

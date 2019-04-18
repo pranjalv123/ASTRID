@@ -33,18 +33,21 @@ void write_matrix(TaxonSet& ts, DistanceMatrix& dm, ostream& os) {
   }
 }
 
-void runPhyDStar(string method, string tempfilename) {
+void runPhyDStar(string method, string tempfilename, vector<string>& java_opts) {
   
 
   JavaVM *jvm;       /* denotes a Java VM */
   JNIEnv *env;       /* pointer to native method interface */
   JavaVMInitArgs vm_args; /* JDK/JRE 6 VM initialization arguments */
-  JavaVMOption* options = new JavaVMOption[1];
+  JavaVMOption* options = new JavaVMOption[1 + java_opts.size()];
 
-  string opts = "-Djava.class.path=" + mydir() + "/PhyDstar.jar";
-  options[0].optionString = &(opts[0]);
+  string opt_classpath = "-Djava.class.path=" + mydir() + "/PhyDstar.jar";
+  options[0].optionString = &(opt_classpath[0]);  
+  for (int i = 0; i < java_opts.size(); i++) {
+    options[i+1].optionString = &(java_opts[i][0]);
+  }
   vm_args.version = JNI_VERSION_1_6;
-  vm_args.nOptions = 1;
+  vm_args.nOptions = 1 + java_opts.size();
   vm_args.options = options;
   vm_args.ignoreUnrecognized = false;
   /* load and initialize a Java VM, return a JNI interface
@@ -76,7 +79,7 @@ void runPhyDStar(string method, string tempfilename) {
 
 }
 
-string BioNJStar(TaxonSet& ts, DistanceMatrix& dm) {
+string BioNJStar(TaxonSet& ts, DistanceMatrix& dm, vector<string>& java_opts) {
 
   string fname = tmpnam(0);
   
@@ -85,7 +88,7 @@ string BioNJStar(TaxonSet& ts, DistanceMatrix& dm) {
   write_matrix(ts, dm, of);
   of.close();
   
-  runPhyDStar("BioNJ", fname);
+  runPhyDStar("BioNJ", fname, java_opts);
 
   string phydstar_tree;
 

@@ -13,6 +13,9 @@ struct Args {
 
   bool octal;
 
+  vector<string> java_opts;
+  bool stacksize_set = false;
+  
   Args(int argc, char** argv) {
     constant = 0;
     octal = false;
@@ -62,6 +65,12 @@ struct Args {
       else if (arg == "-h" || arg == "--help") {
 	cerr << help << endl;
 	exit(1);
+      } else if (arg == "-j" || arg == "--java") {
+	java_opts.push_back(argv[i+1]);
+	if (strncmp(argv[i+1], "-Xss", strlen("-Xss")) == 0) {
+	  stacksize_set = true;
+	}
+	i++;
       }
       else {
 	cerr << "Unrecognized argument " << arg << endl;
@@ -69,6 +78,9 @@ struct Args {
       }
 
 
+    }
+    if (!stacksize_set) {
+      java_opts.push_back("-Xss2M");
     }
     if (infile == "") {
       cerr << help << endl;;
