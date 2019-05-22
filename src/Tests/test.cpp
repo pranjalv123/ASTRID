@@ -5,6 +5,8 @@
 #include "../multind.hpp"
 
 
+
+
 TEST_CASE("OCTAL") {
   TaxonSet ts(10);
   for (int i = 0; i < 10; i++) {
@@ -59,6 +61,31 @@ void verify_mapping(string mapfile, TaxonSet& indiv_ts) {
   REQUIRE(mapping1[indiv_ts["indiv3"]] == mapping1.species()["species2"]);  
 
 }
+
+TEST_CASE("DISCONNECTED") {
+  TaxonSet ts(8);
+  ts.add("t0");
+  ts.add("t1");
+  ts.add("t2");
+  ts.add("t3");
+  ts.add("t4");
+  ts.add("t5");
+  ts.add("t6");
+  ts.add("t7");
+
+
+  string t1 = "(t0, t1,(t2,t3));";
+  string t2 = "(t4, t5,(t6,t7));";
+  DistanceMatrix dm1(ts, t1);
+  DistanceMatrix dm2(ts, t2);
+
+  dm1 += dm2;
+
+  //  cout << UPGMA(ts, dm1);
+  
+  
+}
+
 
 TEST_CASE("IDENTIFY") {
   TaxonSet indiv_ts(3);

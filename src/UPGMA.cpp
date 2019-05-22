@@ -1,5 +1,5 @@
 #include "DistanceMethods.hpp"
-
+#include "util/Logger.hpp"
 
 
 struct Cluster {
@@ -66,6 +66,17 @@ string UPGMA(TaxonSet& ts, DistanceMatrix& dm) {
 					best_score = c.pq.top().first;
 				}
 			}
+		}
+
+		if (best_cluster == -1) { 
+		  WARN << "Extremely high levels of missing data: species graph is disconnected.\nAccuracy will suffer.\n";
+		  for (int i = 0; i < clusters.size(); i++) {
+		    if (clusters[i].exists) {
+		      best_cluster = clusters.size() - 1;
+		      clusters.back().pq.emplace(9999, best_cluster);
+		      break;
+		    }
+		  }
 		}
 
 		int i = best_cluster;
