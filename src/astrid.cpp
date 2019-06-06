@@ -221,6 +221,8 @@ int main(int argc, char** argv) {
       tree = FastME(*species_ts, dm, 1, 1);
     } else if (method == "bionj") {
       tree = BioNJStar(*species_ts, dm, args.java_opts);
+    } else if (method == "rapidnj") {
+      tree = RapidNJ(*species_ts, dm);
     }
 
     ofstream outfile(args.outfile + "." + to_string(iter));

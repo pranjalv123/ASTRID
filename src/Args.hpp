@@ -46,6 +46,9 @@ struct Args {
       else if (arg == "-s") {
         dms.push_back("fastme_spr");
       }
+      else if (arg == "--rapidnj") {
+        dms.push_back("rapidnj");
+      }
       else if (arg == "--bionj") {
         dms.push_back("bionj");
       }

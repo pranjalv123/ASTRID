@@ -1,5 +1,12 @@
 #include "DistanceMethods.hpp"
 
+
+extern "C" {
+#include "fastme/fastme.h"
+}
+
+typedef set mySet;
+
 string FastME (TaxonSet& ts, DistanceMatrix& dm, int nni, int spr)
 {
 	int size = ts.size();
