@@ -33,16 +33,11 @@ string RapidNJ (TaxonSet& ts, DistanceMatrix& dm)
   rapidNJ rnj(reader, matrixSize, false, &pb);
   polytree* tree = rnj.run();
   
-  // for (Taxon t : ts) {
-  //   free (matrix[t]);
-  // }
-  // free (matrix);
 
   std::stringstream out;
 
   tree->serialize_tree(out);
-  //  delete tree;
-  cout << out.str() << endl;
+
   return out.str();
   
 }
