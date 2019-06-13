@@ -1,9 +1,11 @@
 #include "DistanceMethods.hpp"
 
-
 extern "C" {
 #include "fastme/fastme.h"
 }
+
+#include <sstream>
+#include <newick.hpp>
 
 typedef set mySet;
 
@@ -44,9 +46,11 @@ string FastME (TaxonSet& ts, DistanceMatrix& dm, int nni, int spr)
 
 	for (Taxon t : ts) {
 
-		node*  v = makeNode (ts[t].c_str(), -1);
-		v->index2 = t;
-		addToSet(v, &species);
+	  stringstream ss;
+	  ss << t;
+	  node*  v = makeNode (ss.str().c_str(), -1);
+	  v->index2 = t;
+	  addToSet(v, &species);
 	}
 
 
@@ -59,5 +63,5 @@ string FastME (TaxonSet& ts, DistanceMatrix& dm, int nni, int spr)
 	tree_output[0] = '\0';
 
 	NewickPrintTreeStr (t, tree_output, 2);
-	return string(tree_output);
+	return unmap_newick_names(string(tree_output), ts);
 }
