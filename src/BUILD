@@ -1,3 +1,5 @@
+package(default_visibility = ["//test:__subpackages__"])
+
 cc_binary(
     name = "ASTRID-phydstar",
     srcs = [
@@ -18,7 +20,6 @@ cc_binary(
     srcs = [
         "astrid.cpp",
     ],
-    #    features = ["fully_static_link"],
     deps = [
         ":Args",
         ":Multind",

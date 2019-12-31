@@ -8,6 +8,7 @@ cc_library(
         "external/bazel_tools/tools/jdk/include",
         "external/bazel_tools/tools/jdk/include/linux",
     ],
+    linkstatic = 1,
     visibility = [
         "//visibility:public",
     ],
