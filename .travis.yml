@@ -30,6 +30,6 @@ before_install:
   - rm -f install.sh
 
 script:
-  - bazel --bazelrc=bazel.travis.rc build -k //src/ASTRID
-  - bazel --bazelrc=bazel.travis.rc build -k //src/ASTRID-phydstar
+  - bazel --bazelrc=bazel.travis.rc build -k //src:ASTRID
+  - bazel --bazelrc=bazel.travis.rc build -k //src:ASTRID-phydstar
   - bazel --bazelrc=bazel.travis.rc test -k //...
