@@ -1,30 +1,30 @@
 #include "multind.hpp"
-#include "phylokit/util/Logger.hpp"
 #include <boost/tokenizer.hpp>
+#include <glog/logging.h>
 
 
-file_format IndSpeciesMapping::identify(istream& instream) {
+file_format IndSpeciesMapping::identify(std::istream& instream) {
   typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
   boost::char_separator<char> sep(" :,");
-  string line;
+  std::string line;
 
   file_format ff = ASTRIDM;
   
-  while(getline(instream, line)) {
+  while(std::getline(instream, line)) {
     if (line.size() == 0)
       continue;
-    if (line.find(":") != string::npos) {
+    if (line.find(":") != std::string::npos) {
       ff = ASTRAL;
       break;
     }
-    if (line.find(",") != string::npos) {
+    if (line.find(",") != std::string::npos) {
       ff = ASTRAL;
       break;
     }
 
 
     tokenizer tizer(line, sep);
-    vector<string> tokens(tizer.begin(), tizer.end());
+    std::vector<std::string> tokens(tizer.begin(), tizer.end());
     
     if (tokens.size() > 2) {
       ff = ASTRAL;
@@ -44,28 +44,28 @@ file_format IndSpeciesMapping::identify(istream& instream) {
   }
   
   instream.clear();
-  instream.seekg(0, ios::beg);
+  instream.seekg(0, std::ios::beg);
   return ff;
 }
 
-void IndSpeciesMapping::load_astral(istream& instream) {
+void IndSpeciesMapping::load_astral(std::istream& instream) {
 
   typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
   boost::char_separator<char> sep(" :,");
-  string line;
+  std::string line;
   int lineno = 0;
   
-  while (getline(instream,line)) {
+  while (std::getline(instream,line)) {
     lineno++;
     if (line.size() == 0)
       continue;
     tokenizer tokens(line, sep);
-    vector<string> temp;
+    std::vector<std::string> temp;
     temp.assign(tokens.begin(),tokens.end());
 
     if (temp.size() < 2) {
-      ERR << temp.size() << " tokens on line " << lineno << " in mapping file (expected at least 2)" << endl;
-      ERR << "Line " << lineno << ": " <<  line << endl;
+      LOG(ERROR) << temp.size() << " tokens on line " << lineno << " in mapping file (expected at least 2)" << std::endl;
+      LOG(ERROR) << "Line " << lineno << ": " <<  line << std::endl;
       exit(0);
     }
     
@@ -74,16 +74,16 @@ void IndSpeciesMapping::load_astral(istream& instream) {
     for (int i = 1; i < temp.size(); i++) {
       
       if( ! indiv_ts.has(temp[i]) ) {
-	ERR << "Unrecognized taxon " << temp[i] << " in mapping file" << endl;
-	ERR << "Line " << lineno << ": " <<  line << endl;	
+	LOG(ERROR) << "Unrecognized taxon " << temp[i] << " in mapping file" << std::endl;
+	LOG(ERROR) << "Line " << lineno << ": " <<  line << std::endl;
 	exit(0);
       }
       
       Taxon indiv_tax   = indiv_ts[temp[i]];    
       
       if (ind_species_map.count(indiv_tax)) {
-	ERR << "Individual " << temp[i] << " appears twice in mapping file!" << endl;
-	ERR << "Line " << lineno << ": " <<  line << endl;
+	LOG(ERROR) << "Individual " << temp[i] << " appears twice in mapping file!" << std::endl;
+	LOG(ERROR) << "Line " << lineno << ": " <<  line << std::endl;
 	exit(0);
       }
 
@@ -95,30 +95,30 @@ void IndSpeciesMapping::load_astral(istream& instream) {
   }
 }
 
-void IndSpeciesMapping::load_astridm(istream& instream) {
+void IndSpeciesMapping::load_astridm(std::istream& instream) {
 
   typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
   boost::char_separator<char> sep(" ");
-  string line;
+  std::string line;
   int lineno = 0;
   
-  while (getline(instream,line)) {
+  while (std::getline(instream,line)) {
     lineno++;
     if (line.size() == 0)
       continue;
     tokenizer tokens(line, sep);
     
-    vector<string> temp;
+    std::vector<std::string> temp;
     temp.assign(tokens.begin(),tokens.end());
     if (temp.size() != 2) {
-      ERR << temp.size() << " tokens on line " << lineno << " in mapping file (expected 2)" << endl;
-      ERR << "Line " << lineno << ": " <<  line << endl;
+      LOG(ERROR) << temp.size() << " tokens on line " << lineno << " in mapping file (expected 2)" << std::endl;
+      LOG(ERROR) << "Line " << lineno << ": " <<  line << std::endl;
       exit(0);
     }
 
     if( ! indiv_ts.has(temp[0]) ) {
-      ERR << "Unrecognized taxon " << temp[0] << " in mapping file" << endl;
-      ERR << "Line " << lineno << ": " <<  line << endl;	
+      LOG(ERROR) << "Unrecognized taxon " << temp[0] << " in mapping file" << std::endl;
+      LOG(ERROR) << "Line " << lineno << ": " <<  line << std::endl;
       exit(0);
     }
 
@@ -127,8 +127,8 @@ void IndSpeciesMapping::load_astridm(istream& instream) {
     Taxon indiv_tax   = indiv_ts[temp[0]];    
 
     if (ind_species_map.count(indiv_tax)) {
-      ERR << "Individual " << temp[0] << " appears twice in mapping file!" << endl;
-      ERR << "Line " << lineno << ": " <<  line << endl; 
+      LOG(ERROR) << "Individual " << temp[0] << " appears twice in mapping file!" << std::endl;
+      LOG(ERROR) << "Line " << lineno << ": " <<  line << std::endl;
       exit(0);
     }
 
@@ -141,7 +141,7 @@ void IndSpeciesMapping::load_astridm(istream& instream) {
 }
 
 
-void IndSpeciesMapping::load(istream& instream) {
+void IndSpeciesMapping::load(std::istream& instream) {
   if (identify(instream) == ASTRAL) {
     load_astral(instream);
   } else {
@@ -160,8 +160,8 @@ void IndSpeciesMapping::load(istream& instream) {
 
 
 
-void IndSpeciesMapping::load(string& infile) {
-  ifstream instream(infile);
+void IndSpeciesMapping::load(std::string& infile) {
+  std::ifstream instream(infile);
   load(instream);
   instream.close();
 }

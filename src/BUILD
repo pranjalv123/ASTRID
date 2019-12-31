@@ -11,6 +11,7 @@ cc_binary(
         ":Multind",
         ":Octal",
         "//src/DistanceMethods",
+        "@com_github_google_glog//:glog",
         "@phylokit",
     ],
 )
@@ -41,6 +42,7 @@ cc_library(
     hdrs = ["multind.hpp"],
     deps = [
         "@boost//:tokenizer",
+        "@com_github_google_glog//:glog",
         "@phylokit",
     ],
 )

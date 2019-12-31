@@ -5,8 +5,7 @@
 #include "phylokit/newick.hpp"
 #include <iostream>
 #include <fstream>
-#include "phylokit/util/Logger.hpp"
-
+#include <glog/logging.h>
 
 bool has_missing(TaxonSet& ts, DistanceMatrix& dm) {
   for (size_t i = 0; i < ts.size(); i++) {
@@ -19,20 +18,20 @@ bool has_missing(TaxonSet& ts, DistanceMatrix& dm) {
   return false;
 }
 
-TaxonSet get_ts(vector<string>& newicks){
-  unordered_set<string> taxa;
-  for (string n : newicks) {
+TaxonSet get_ts(std::vector<std::string>& newicks){
+  std::unordered_set<std::string> taxa;
+  for (std::string n : newicks) {
     newick_to_ts(n, taxa);
   }
   TaxonSet ts(taxa.size());
-  for (string t : taxa) {
+  for (std::string t : taxa) {
     ts.add(t);
   }
   return ts;
 
 }
 
-DistanceMatrix get_distance_matrix(TaxonSet& ts, vector<string> newicks, vector<double> weights, vector<Clade>& tree_taxa, IndSpeciesMapping* imap) {
+DistanceMatrix get_distance_matrix(TaxonSet& ts, std::vector<std::string> newicks, std::vector<double> weights, std::vector<Clade>& tree_taxa, IndSpeciesMapping* imap) {
   
   DistanceMatrix result(ts);
   if (imap) {
@@ -40,7 +39,7 @@ DistanceMatrix get_distance_matrix(TaxonSet& ts, vector<string> newicks, vector<
   }
   
   for (size_t i = 0; i < newicks.size(); i++) {
-    string& n = newicks[i];
+    std::string& n = newicks[i];
     double w  = weights[i];
 
 
@@ -78,16 +77,16 @@ DistanceMatrix get_distance_matrix(TaxonSet& ts, vector<string> newicks, vector<
 
 }
 
-DistanceMatrix get_distance_matrix(TaxonSet& ts, vector<string> newicks, IndSpeciesMapping* imap) {
-  vector<Clade> vc;
-  return get_distance_matrix(ts, newicks, vector<double>(newicks.size(), 1), vc, imap);
+DistanceMatrix get_distance_matrix(TaxonSet& ts, std::vector<std::string> newicks, IndSpeciesMapping* imap) {
+  std::vector<Clade> vc;
+  return get_distance_matrix(ts, newicks, std::vector<double>(newicks.size(), 1), vc, imap);
 }
 
-DistanceMatrix get_distance_matrix(TaxonSet& ts, vector<string> newicks, vector<Clade>& tree_taxa, IndSpeciesMapping* imap) {
-  return get_distance_matrix(ts, newicks, vector<double>(newicks.size(), 1), tree_taxa, imap);
+DistanceMatrix get_distance_matrix(TaxonSet& ts, std::vector<std::string> newicks, std::vector<Clade>& tree_taxa, IndSpeciesMapping* imap) {
+  return get_distance_matrix(ts, newicks, std::vector<double>(newicks.size(), 1), tree_taxa, imap);
 }
 
-string run_astrid(vector<string> newicks) {
+std::string run_astrid(std::vector<std::string> newicks) {
   return "";
 }
 
@@ -103,12 +102,12 @@ void fill_in(TaxonSet& ts, DistanceMatrix& dm, double cval) {
       }
     }
   }
-  cerr << "Filled in " << count << " elements" << endl;
+  std::cerr << "Filled in " << count << " elements" << std::endl;
 
 }
 
-void fill_in(TaxonSet& ts, DistanceMatrix& dm, string tree) {
-  vector<string> trees;
+void fill_in(TaxonSet& ts, DistanceMatrix& dm, std::string tree) {
+  std::vector<std::string> trees;
   trees.push_back(tree);
   DistanceMatrix dm_tree = get_distance_matrix(ts, trees, NULL);
 
@@ -124,37 +123,35 @@ void fill_in(TaxonSet& ts, DistanceMatrix& dm, string tree) {
 }
 
 void progressbar(double pct) {
-  cerr << "[";
+  std::cerr << "[";
   for (int i = 0; i < (int)(68 * pct); i++) {
-    cerr << "#";
+    std::cerr << "#";
   }
   for (int i = (int)(68 * pct); i < 68; i++) {
-    cerr << "-";
+    std::cerr << "-";
   }
-  cerr << "]\r";
+  std::cerr << "]\r";
 }
 
 int main(int argc, char** argv) {
-  Logger::enable("PROGRESS");
-  Logger::enable("ERROR"); 
   Args args(argc, argv);
 
   
-  vector<string> input_trees;
-  ifstream inf(args.infile);
+  std::vector<std::string> input_trees;
+  std::ifstream inf(args.infile);
 
-  string buf;
-  PROGRESS << "Reading trees..." << endl;
+  std::string buf;
+  LOG(INFO) << "Reading trees..." << std::endl;
   while(!inf.eof()) {
     getline(inf, buf);
     if (buf.size() > 3)
       input_trees.push_back(buf);
   }
-  PROGRESS << "Read " << input_trees.size() << " trees" << endl;
+  LOG(INFO) << "Read " << input_trees.size() << " trees" << std::endl;
   
   TaxonSet ts = get_ts(input_trees);
   int iter = 1;
-  string tree;
+  std::string tree;
  
 
   //Set up multi-individual mapping
@@ -167,22 +164,22 @@ int main(int argc, char** argv) {
   
   DistanceMatrix dm = get_distance_matrix(ts, input_trees, multind_mapping);
 
-  cerr << "Estimating tree" << endl;
-  for (string method : args.dms) {
-    cerr << "Running " << method << endl;
+  std::cerr << "Estimating tree" << std::endl;
+  for (std::string method : args.dms) {
+    std::cerr << "Running " << method << std::endl;
 
     //OCTAL completion of trees with missing data
     if (tree.size() && args.octal) {
 
-      vector<string> completed_trees;
-      vector<Clade>  tree_taxa;
+      std::vector<std::string> completed_trees;
+      std::vector<Clade>  tree_taxa;
       Tree T = newick_to_treeclades(tree, ts);
-      for (string t_s : input_trees) {
+      for (std::string t_s : input_trees) {
         Tree t = newick_to_treeclades(t_s, ts);
         tree_taxa.push_back(t.taxa());
 
         octal_complete(T, t);
-        stringstream ss;
+        std::stringstream ss;
         ss << t;
         completed_trees.push_back(ss.str());
       }
@@ -205,10 +202,10 @@ int main(int argc, char** argv) {
 
     if (method == "auto") {
       if (has_missing(*species_ts, dm)) {
-	cerr << "Missing entries in distance matrix, running BioNJ*" << endl;
+	std::cerr << "Missing entries in distance matrix, running BioNJ*" << std::endl;
 	tree = BioNJStar(*species_ts, dm, args.java_opts);
       } else {
-	cerr << "No missing entries in distance matrix, running FastME2+SPR" << endl;	
+	std::cerr << "No missing entries in distance matrix, running FastME2+SPR" << std::endl;
 	tree = FastME(*species_ts, dm, 1, 1);
       }
     } else if (method == "upgma") {
@@ -225,14 +222,14 @@ int main(int argc, char** argv) {
       tree = RapidNJ(*species_ts, dm);
     }
 
-    ofstream outfile(args.outfile + "." + to_string(iter));
-    outfile << tree << endl;
+    std::ofstream outfile(args.outfile + "." + std::to_string(iter));
+    outfile << tree << std::endl;
     iter ++;
   }
-  ofstream outfile(args.outfile);
-  outfile << tree << endl;
+  std::ofstream outfile(args.outfile);
+  outfile << tree << std::endl;
 
-  cout <<  tree << endl;
+  std::cout <<  tree << std::endl;
 
   return 0;
 }
