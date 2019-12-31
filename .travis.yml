@@ -6,6 +6,7 @@ language: c++
 os:
   - linux
   - osx
+  - windows
 
 env:
   - V=1.2.1
@@ -14,6 +15,7 @@ before_install:
   - OS=linux
   - ARCH=x86_64
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then OS=darwin; fi
+  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then OS=windows; fi
   - GH_BASE="https://github.com/bazelbuild/bazel/releases/download/$V"
   - GH_ARTIFACT="bazel-$V-installer-$OS-$ARCH.sh"
   - CI_BASE="http://ci.bazel.io/job/Bazel/JAVA_VERSION=1.8,PLATFORM_NAME=$OS-$ARCH/lastSuccessfulBuild/artifact/output/ci"
