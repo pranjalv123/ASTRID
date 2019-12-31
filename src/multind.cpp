@@ -1,6 +1,6 @@
 #include "multind.hpp"
-#include <util/Logger.hpp>
-#include<boost/tokenizer.hpp>
+#include "phylokit/util/Logger.hpp"
+#include <boost/tokenizer.hpp>
 
 
 file_format IndSpeciesMapping::identify(istream& instream) {

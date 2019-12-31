@@ -1,9 +1,10 @@
 #ifndef HELP_HPP
 #define HELP_HPP
+#include <string>
 
-string version="2.2.1";
+std::string version="2.2.1";
 
-string help = ""
+std::string help = ""
   "********************************\n"
   "****** ASTRID version " + version + " ******\n"
   "********************************\n"

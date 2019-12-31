@@ -20,7 +20,7 @@ message(WARNING ${JAVA_JVM_LIBRARY})
 
 include_directories(${JNI_INCLUDE_DIRS} ${JNI_INCLUDE_DIRS2})
 add_executable(ASTRID ${SOURCES} astrid.cpp)
-add_executable(Test ${TEST_SOURCES} Tests/test.cpp Tests/runner.cpp)
+add_executable(Test ${TEST_SOURCES} ../Tests/test.cpp ../Tests/runner.cpp)
 
 
 target_link_libraries(ASTRID ${JAVA_JVM_LIBRARY} libphylokit.a)

@@ -1,5 +1,5 @@
-#include <TreeClade.hpp>
-#include <newick.hpp>
+#include "phylokit/TreeClade.hpp"
+#include "phylokit/newick.hpp"
 #include "octal.hpp"
 
 
@@ -17,7 +17,7 @@ TreeClade& find_root(TreeClade& T, Taxon x,  const Clade& t_taxa) {
 }
 
 
-void insert_leaf(Tree& T, Tree& t, int T_node, int t_node, Taxon x, unordered_map<int, int>& A) {
+void insert_leaf(Tree& T, Tree& t, int T_node, int t_node, Taxon x, std::unordered_map<int, int>& A) {
   int newnode = t.addNode();
 
   int xnode = t.addNode();
@@ -43,7 +43,7 @@ void insert_leaf(Tree& T, Tree& t, int T_node, int t_node, Taxon x, unordered_ma
     current = t.node(current).parent;
   }
 
-  vector<int> to_change;
+  std::vector<int> to_change;
   int T_xnode = -1;
   for (auto x : A) {
     if (x.second == t_node && x.first != T_node ){
@@ -65,7 +65,7 @@ void insert_leaf(Tree& T, Tree& t, int T_node, int t_node, Taxon x, unordered_ma
 
 }
 
-void add_node(Tree& T, Tree& t, unordered_map<int, int>& A, Taxon x) {
+void add_node(Tree& T, Tree& t, std::unordered_map<int, int>& A, Taxon x) {
   int xroot = find_root(T.root(), x, t.taxa()).index;
   while(true) {
     if(A.count(xroot)) {
@@ -81,7 +81,7 @@ void add_node(Tree& T, Tree& t, unordered_map<int, int>& A, Taxon x) {
   }
 }
 
-void shared_edges(Tree& T, Tree& t, unordered_map<int, int>& A) {
+void shared_edges(Tree& T, Tree& t, std::unordered_map<int, int>& A) {
   TaxonSet& ts = T.ts;
   DistanceMatrix lca1(ts);
   DistanceMatrix lca2(ts);
@@ -132,7 +132,7 @@ void shared_edges(Tree& T, Tree& t, unordered_map<int, int>& A) {
 }
 
 void octal_complete(Tree& T, Tree& t) {
-  unordered_map<int, int> shared;
+  std::unordered_map<int, int> shared;
   TaxonSet& ts = T.ts;
   shared_edges(T, t, shared);
   for (Taxon x : T.taxa()) {

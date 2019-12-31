@@ -1,11 +1,11 @@
-#include "DistanceMethods.hpp"
+#include "DistanceMethods/DistanceMethods.hpp"
 #include "multind.hpp"
 #include "Args.hpp"
 #include "octal.hpp"
-#include <newick.hpp>
+#include "phylokit/newick.hpp"
 #include <iostream>
 #include <fstream>
-#include "util/Logger.hpp"
+#include "phylokit/util/Logger.hpp"
 
 
 bool has_missing(TaxonSet& ts, DistanceMatrix& dm) {

@@ -2,25 +2,27 @@
 #define ARGS_HPP
 
 #include "help.hpp"
+#include <string>
+#include <vector>
 
 struct Args {
-  string infile;
-  string outfile;
-  string multindfile;
+  std::string infile;
+  std::string outfile;
+  std::string multindfile;
   
   double constant;
-  vector<string> dms;
+  std::vector<std::string> dms;
 
   bool octal;
 
-  vector<string> java_opts;
+  std::vector<std::string> java_opts;
   bool stacksize_set = false;
   
   Args(int argc, char** argv) {
     constant = 0;
     octal = false;
     for (int i = 1; i < argc; i++) {
-      string arg(argv[i]);
+      std::string arg(argv[i]);
       if (arg == "-i" || arg == "--input") {
         infile = argv[i+1];
         i++;
@@ -66,7 +68,7 @@ struct Args {
 	i++;
       }
       else if (arg == "-h" || arg == "--help") {
-	cerr << help << endl;
+        std::cerr << help << std::endl;
 	exit(1);
       } else if (arg == "-j" || arg == "--java") {
 	java_opts.push_back(argv[i+1]);
@@ -76,7 +78,7 @@ struct Args {
 	i++;
       }
       else {
-	cerr << "Unrecognized argument " << arg << endl;
+        std::cerr << "Unrecognized argument " << arg << std::endl;
 	exit(1);
       }
 
@@ -86,7 +88,7 @@ struct Args {
       java_opts.push_back("-Xss2M");
     }
     if (infile == "") {
-      cerr << help << endl;;
+      std::cerr << help << std::endl;;
         exit(1);
     }
     if (outfile == "") {

@@ -3,7 +3,7 @@
 
 #include <fstream>
 #include <iostream>
-#include <DistanceMatrix.hpp>
+#include "phylokit/DistanceMatrix.hpp"
 #include <string>
 #include <unordered_map>
 
@@ -12,8 +12,8 @@ enum file_format {ASTRAL, ASTRIDM};
 
 class IndSpeciesMapping {
 private:
-  map<Taxon, Taxon> ind_species_map;
-  map<Taxon, vector<Taxon>> species_ind_map;
+  std::map<Taxon, Taxon> ind_species_map;
+  std::map<Taxon, std::vector<Taxon>> species_ind_map;
 
   TaxonSet& indiv_ts;
   TaxonSet species_ts;
@@ -31,12 +31,12 @@ public:
 
   DistanceMatrix average(DistanceMatrix& indiv_mat) const;
 
-  file_format identify(istream& instream);
+  file_format identify(std::istream& instream);
 
-  void load_astral(istream& instream);
-  void load_astridm(istream& instream);
-  void load(istream& instream);
-  void load(string& infile);      
+  void load_astral(std::istream& instream);
+  void load_astridm(std::istream& instream);
+  void load(std::istream& instream);
+  void load(std::string& infile);
   
   TaxonSet& species();
   TaxonSet& indivs();
