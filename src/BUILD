@@ -21,7 +21,6 @@ cc_binary(
     srcs = [
         "astrid.cpp",
     ],
-    copts = ["-std=c++14"],
     deps = [
         ":Args",
         ":Multind",
