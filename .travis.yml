@@ -2,39 +2,43 @@ dist: trusty
 sudo: required
 osx_image: xcode8
 language: c++
-
 os:
-  - linux
-  - osx
-  - windows
-
+- linux
+- osx
+- windows
 env:
-  - V=1.2.1
-
+- V=1.2.1
 before_install:
-  - |
-    if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
-      choco install jdk8 -params 'installdir=c:\\java8'
-      choco install bazel --version $V
-    else
-    OS=linux
-    ARCH=x86_64
-    if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then OS=darwin; fi
-    if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then OS=windows; fi
-    GH_BASE="https://github.com/bazelbuild/bazel/releases/download/$V"
-    GH_ARTIFACT="bazel-$V-installer-$OS-$ARCH.sh"
-    CI_BASE="http://ci.bazel.io/job/Bazel/JAVA_VERSION=1.8,PLATFORM_NAME=$OS-$ARCH/lastSuccessfulBuild/artifact/output/ci"
-    CI_ARTIFACT="bazel--installer.sh"
-    URL="$GH_BASE/$GH_ARTIFACT"
-    if [[ "$V" == "HEAD" ]]; then CI_ARTIFACT="`wget -qO- $CI_BASE | grep -o 'bazel-[-_a-zA-Z0-9\.]*-installer.sh' | uniq`"; fi
-    if [[ "$V" == "HEAD" ]]; then URL="$CI_BASE/$CI_ARTIFACT"; fi
-    echo $URL
-    wget -O install.sh $URL
-    chmod +x install.sh
-    ./install.sh --user
-    rm -f install.sh
-    fi
-
+- |
+  if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
+    choco install jdk8 -params 'installdir=c:\\java8'
+    choco install bazel --version $V
+  else
+  OS=linux
+  ARCH=x86_64
+  if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then OS=darwin; fi
+  if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then OS=windows; fi
+  GH_BASE="https://github.com/bazelbuild/bazel/releases/download/$V"
+  GH_ARTIFACT="bazel-$V-installer-$OS-$ARCH.sh"
+  CI_BASE="http://ci.bazel.io/job/Bazel/JAVA_VERSION=1.8,PLATFORM_NAME=$OS-$ARCH/lastSuccessfulBuild/artifact/output/ci"
+  CI_ARTIFACT="bazel--installer.sh"
+  URL="$GH_BASE/$GH_ARTIFACT"
+  if [[ "$V" == "HEAD" ]]; then CI_ARTIFACT="`wget -qO- $CI_BASE | grep -o 'bazel-[-_a-zA-Z0-9\.]*-installer.sh' | uniq`"; fi
+  if [[ "$V" == "HEAD" ]]; then URL="$CI_BASE/$CI_ARTIFACT"; fi
+  echo $URL
+  wget -O install.sh $URL
+  chmod +x install.sh
+  ./install.sh --user
+  rm -f install.sh
+  fi
 script:
-  - bazel --bazelrc=bazel.travis.rc build //src:ASTRID
-  - bazel --bazelrc=bazel.travis.rc test //test/...
+- bazel --bazelrc=bazel.travis.rc build //src:ASTRID
+- bazel --bazelrc=bazel.travis.rc test //test/...
+deploy:
+  provider: releases
+  api_key:
+    secure: jxyMG9rZkg5LVhK+oROsR2IvKg4zEtDVfA7HwoWdI/QWnP9Z02jDlmWv2Wz/pCfiAea0codTLkjpmSz+SvD5n0CKyPmPGhbQqOeuCBI5QjBclYDlgCHlI6QCfIiwfYCu2hFspNI9g6NRoMGOLsbXCLxTgcMiNQiJvFVH8l44OueftdNy8cQMr6NdZJs6K0DGibBZ+DhLMLYSvOPfpDZ/nX/tMYLbCk/2bk/5uCPUcK+JaQXeGGVCU85+CelEeK2BFfDB4BBL0Kclit7YaHH/36NEM/ysq3SqjogrK4EsEFnAzPmoV4Vuqoor9h2IGl9EsaiEbcWl1foPsuT1s7ZPOiaDVyaTNVmBfgdHxIm0juZoOEbGicX86rOnokmyQMGSw2KGifviafGX7ilTZs0SpOfaQvecrLTAIQr46f5DmnRvLSdTwqJbQklatrITSCH6TbjcJb8NpxlE+bLeVKJwiHVSMJin2xRMPGJExGQjCJF69CvUsTI0q+Oz9oobGiPj9wLl6k4dg1n75ohXYB1RWWhjWJOfxBOcMUlE/5o+v0Ys710JF4P36/7vB1H0bCEnNxhYZcAGXEeoV4V8MIGAlJ0XU2VrgYUhuqJQ+Puy+gLnY/v7eMrougUvh1P5Rsae1ZDro86+i+La2EmttNM4sPgeYL3fru5JSEqzoeBVODs=
+  file: bazel-bin/src/ASTRID
+  on:
+    repo: pranjalv123/ASTRID
+    branch: bazel-migration
