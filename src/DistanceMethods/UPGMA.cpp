@@ -14,7 +14,7 @@ struct Cluster {
 	Cluster(size_t c1, size_t c2, size_t sz) : c1(c1), c2(c2), sz(sz), exists(1),  t(-1) {}
 	std::priority_queue<pair<double, size_t>, std::vector<pair<double, size_t>>, std::greater<pair<double, size_t>> > pq;
 
-	std::stringstream newick(TaxonSet& ts, std::vector<Cluster>& clusts) {
+	std::string newick(TaxonSet& ts, std::vector<Cluster>& clusts) {
 		std::stringstream ss;
 		if (c1 != -1) {
 			ss << "(" << clusts[c1].newick(ts, clusts).str() << "," << clusts[c2].newick(ts, clusts).str() << ")";
@@ -22,7 +22,7 @@ struct Cluster {
 		} else {
 			ss << ts[t];
 		}
-		return ss;
+		return ss.str();
 	}
 };
 
@@ -119,6 +119,6 @@ std::string UPGMA(TaxonSet& ts, DistanceMatrix& dm) {
 
 	}
 
-	return clusters.back().newick(ts, clusters).str();
+	return clusters.back().newick(ts, clusters);
 
 }
