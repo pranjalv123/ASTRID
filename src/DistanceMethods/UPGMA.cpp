@@ -1,20 +1,21 @@
 #include "DistanceMethods.hpp"
-#include "util/Logger.hpp"
+#include <glog/logging.h>
 
+using std::pair;
 
 struct Cluster {
 	int c1;
 	int c2;
 	size_t sz;
-	unordered_map<size_t, double> d;
+	std::unordered_map<size_t, double> d;
 	int exists;
 	Taxon t;
 	Cluster(Taxon t) : c1(-1), c2(-1), sz(1), exists(1), t(t) {}
 	Cluster(size_t c1, size_t c2, size_t sz) : c1(c1), c2(c2), sz(sz), exists(1),  t(-1) {}
-	priority_queue<pair<double, size_t>, std::vector<pair<double, size_t>>, std::greater<pair<double, size_t>> > pq;
+	std::priority_queue<pair<double, size_t>, std::vector<pair<double, size_t>>, std::greater<pair<double, size_t>> > pq;
 
-	stringstream newick(TaxonSet& ts, vector<Cluster>& clusts) {
-		stringstream ss;
+	std::stringstream newick(TaxonSet& ts, std::vector<Cluster>& clusts) {
+		std::stringstream ss;
 		if (c1 != -1) {
 			ss << "(" << clusts[c1].newick(ts, clusts).str() << "," << clusts[c2].newick(ts, clusts).str() << ")";
 
@@ -27,8 +28,8 @@ struct Cluster {
 
 
 
-string UPGMA(TaxonSet& ts, DistanceMatrix& dm) {
-	vector<Cluster> clusters;
+std::string UPGMA(TaxonSet& ts, DistanceMatrix& dm) {
+	std::vector<Cluster> clusters;
 	for (size_t i = 0; i < ts.size(); i++) {
 		clusters.emplace_back(i);
 	}
@@ -46,7 +47,7 @@ string UPGMA(TaxonSet& ts, DistanceMatrix& dm) {
 
 	while(clusters.back().sz < ts.size()) {
 		size_t best_cluster = -1;
-		double best_score   = numeric_limits<double>::max();
+		double best_score   = std::numeric_limits<double>::max();
 
 		for (size_t i = 0; i < clusters.size(); i++) {
 			Cluster& c = clusters[i];
@@ -69,7 +70,7 @@ string UPGMA(TaxonSet& ts, DistanceMatrix& dm) {
 		}
 
 		if (best_cluster == -1) { 
-		  WARN << "Extremely high levels of missing data: species graph is disconnected.\nAccuracy will suffer.\n";
+		  LOG(WARNING) << "Extremely high levels of missing data: species graph is disconnected.\nAccuracy will suffer.\n";
 		  for (int i = 0; i < clusters.size(); i++) {
 		    if (clusters[i].exists) {
 		      best_cluster = clusters.size() - 1;

@@ -60,7 +60,10 @@ cc_library(
     name = "UPGMA",
     srcs = ["UPGMA.cpp"],
     hdrs = ["DistanceMethods.hpp"],
-    deps = ["@phylokit"],
+    deps = [
+        "@com_github_google_glog//:glog",
+        "@phylokit",
+    ],
 )
 
 cc_library(
