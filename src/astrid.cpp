@@ -202,7 +202,8 @@ int main(int argc, char** argv) {
 
     if (method == "auto") {
       if (has_missing(*species_ts, dm)) {
-	std::cerr << "Missing entries in distance matrix, running BioNJ*" << std::endl;
+	std::cerr << "Missing entries in distance matrix, trying to run BioNJ*" << std::endl;
+	std::cerr << "You may have better results adding -u -s to your command line to use UPGMA completion instead." << std::endl;
 	tree = BioNJStar(*species_ts, dm, args.java_opts);
       } else {
 	std::cerr << "No missing entries in distance matrix, running FastME2+SPR" << std::endl;
