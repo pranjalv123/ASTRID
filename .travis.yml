@@ -33,6 +33,7 @@ before_install:
 script:
 - bazel --bazelrc=bazel.travis.rc build //src:ASTRID
 - bazel --bazelrc=bazel.travis.rc test //test/...
+
 deploy:
   provider: releases
   api_key:
@@ -41,3 +42,4 @@ deploy:
   on:
     repo: pranjalv123/ASTRID
     branch: bazel-migration
+  skip_cleanup: true
