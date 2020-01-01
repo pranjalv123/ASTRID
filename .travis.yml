@@ -36,5 +36,5 @@ before_install:
     fi
 
 script:
-  - bazel --bazelrc=bazel.travis.rc build -k //src:ASTRID
-  - bazel --bazelrc=bazel.travis.rc test -k //test/...
+  - bazel --bazelrc=bazel.travis.rc build //src:ASTRID
+  - bazel --bazelrc=bazel.travis.rc test //test/...
