@@ -1,7 +1,6 @@
 cc_library(
     name = "DistanceMethods",
     hdrs = ["DistanceMethods.hpp"],
-    copts = ["-DUSE_PHYDSTAR"],
     visibility = ["//visibility:public"],
     deps = [
         "PhyDStar",
@@ -16,7 +15,7 @@ cc_library(
     hdrs = ["DistanceMethods.hpp"],
     visibility = ["//visibility:public"],
     deps = [
-        "PhyDStar",
+        "PhyDStar-stub",
         ":FastMEInterface",
         ":RapidNJInterface",
         ":UPGMA",
@@ -44,11 +43,21 @@ cc_library(
 )
 
 cc_library(
+    name = "PhyDStar-stub",
+    srcs = [
+        "phydstar.cpp",
+    ],
+    hdrs = ["DistanceMethods.hpp"],
+    deps = ["@phylokit"],
+)
+
+cc_library(
     name = "PhyDStar",
     srcs = [
         "phydstar.cpp",
     ],
     hdrs = ["DistanceMethods.hpp"],
+    copts = ["-DUSE_PHYDSTAR"],
     deps = [
         ":whereami",
         "//:jni_headers",
