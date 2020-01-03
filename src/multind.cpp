@@ -174,14 +174,21 @@ DistanceMatrix IndSpeciesMapping::average(DistanceMatrix& indiv_mat) const {
   DistanceMatrix species_mat(species_ts);
   for (const Taxon i_s : species_ts) {
     for (const Taxon j_s : species_ts) {
+      if (i_s == j_s) {
+        species_mat(i_s, j_s) = 0;
+        species_mat.masked(i_s, j_s) = 1;
+        continue;
+      }
       double sum_ij = 0;
       double count_ij = 0;
       for (const Taxon i_i : species_ind_map.at(i_s) ) {
         for (const Taxon j_i : species_ind_map.at(j_s) ) {
-	    sum_ij += indiv_mat(i_i, j_i);
-	    count_ij++;
-	  }
-	}
+          if (indiv_mat.has(i_i, j_i)) {
+            sum_ij += indiv_mat(i_i, j_i);
+            count_ij++;
+          }
+        }
+      }
       if (count_ij == 0) {
 	species_mat(i_s, j_s) = 0;
 	species_mat.masked(i_s, j_s) = 0;	
@@ -192,6 +199,11 @@ DistanceMatrix IndSpeciesMapping::average(DistanceMatrix& indiv_mat) const {
     }
   }
   return species_mat;
+}
+
+void IndSpeciesMapping::add_indiv_to_species(Taxon indiv, std::string species) {
+  ind_species_map[indiv] = species_ts.add(species);
+  species_ind_map[species_ts.add(species)].push_back(indiv);
 }
 
 TaxonSet& IndSpeciesMapping::species() {

@@ -9,3 +9,13 @@ cc_test(
         "@phylokit",
     ],
 )
+
+cc_test(
+    name = "multind",
+    srcs = ["multind.cpp"],
+    deps = [
+        "//src:Multind",
+        "@catch2//:main",
+        "@phylokit",
+    ],
+)

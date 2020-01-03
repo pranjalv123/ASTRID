@@ -37,6 +37,8 @@ public:
   void load_astridm(std::istream& instream);
   void load(std::istream& instream);
   void load(std::string& infile);
+
+  void add_indiv_to_species(Taxon indiv, std::string species);
   
   TaxonSet& species();
   TaxonSet& indivs();
