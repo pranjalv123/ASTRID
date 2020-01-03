@@ -4,6 +4,8 @@
 #include "help.hpp"
 #include <string>
 #include <vector>
+#include <iostream>
+#include <cstring>
 
 struct Args {
   std::string infile;
