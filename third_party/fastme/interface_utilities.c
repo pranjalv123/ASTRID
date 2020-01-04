@@ -312,7 +312,7 @@ FILE *Openfile (char *filename, char *mode)
 
 	fp = fopen(filename, mode);
 	if (!fp)
-		Exit ( (char*)"Cannot open file '%s'", basename (filename));
+		Exit ( (char*)"Cannot open file '%s'", filename);
 
 	return fp;
 }
