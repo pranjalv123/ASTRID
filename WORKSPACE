@@ -37,3 +37,9 @@ git_repository(
     commit = "aac94d561d24cb747a1e8381ffa2da0a0a0d72b6",
     remote = "https://github.com/pranjalv123/phylokit/",
 )
+
+git_repository(
+    name = "platforms",
+    commit = "46993efdd33b73649796c5fc5c9efb193ae19d51",
+    remote = "https://github.com/bazelbuild/platforms.git",
+)

@@ -36,10 +36,17 @@ cc_library(
     name = "RapidNJInterface",
     srcs = ["RapidNJInterface.cpp"],
     hdrs = ["DistanceMethods.hpp"],
-    deps = [
-        "//third_party/rapidNJ",
-        "@phylokit",
-    ],
+    deps =
+        select(
+            {
+                "//:is_windows": [],
+                "//conditions:default": [
+                    "//third_party/rapidNJ",
+                ],
+            },
+        ) + [
+            "@phylokit",
+        ],
 )
 
 cc_library(
