@@ -46,7 +46,6 @@ void Usage (void);
 
 Options *chooseSettings (int argc, char **argv);
 void Set_Defaults_Input (Options *input);
-void Get_Input_Interactive (Options *input);
 void Get_Input_CommandLine (Options *input, int argc, char **argv);
 
 #endif /*OPTIONS_H_*/
