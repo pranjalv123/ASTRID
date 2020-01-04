@@ -292,7 +292,7 @@ double **initDoubleMatrix (int d);
 void fillZeroMatrix (double ***A, int d);
 boolean whiteSpace (char c);
 void Uppercase (char *str);
-void Exit (char *message, ...) __attribute__ ((noreturn));
+void Exit (char *message, ...);
 void Warning (char *message, ...);
 void Message (char *message, ...);
 void Debug (char *message, ...);
