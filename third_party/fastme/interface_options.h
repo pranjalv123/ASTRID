@@ -44,7 +44,6 @@ void Usage (void);
 #endif
 
 
-Options *chooseSettings (int argc, char **argv);
 void Set_Defaults_Input (Options *input);
 void Get_Input_CommandLine (Options *input, int argc, char **argv);
 
