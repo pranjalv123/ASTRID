@@ -1,4 +1,15 @@
 #include "DistanceMethods.hpp"
+#ifdef _WIN32
+#include "glog/logging.h"
+#include <iostream>
+
+string RapidNJ (TaxonSet& ts, DistanceMatrix& dm) {
+  LOG(ERROR) << "RapidNJ is not supported on Windows" << std::endl;
+  return "RapidNJ is not supported on Windows";
+}
+
+#else
+
 #include "third_party/rapidNJ/rapidNJ.h"
 #include <sstream>
 
@@ -42,3 +53,4 @@ string RapidNJ (TaxonSet& ts, DistanceMatrix& dm)
   
 }
 
+#endif
