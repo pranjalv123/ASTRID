@@ -29,7 +29,6 @@
 #include <time.h>
 #include <string.h>
 #include <fcntl.h>
-#include <getopt.h>
 #include <ctype.h>
 #include <errno.h>
 #include <float.h>
