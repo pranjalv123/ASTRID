@@ -32,9 +32,9 @@ before_install:
   rm -f install.sh
   fi
 script:
-- bazel --bazelrc=bazel.travis.rc build //src:ASTRID -c opt
+- bazel --bazelrc=bazel.travis.rc build src:ASTRID -c opt
 - cp bazel-bin/src/ASTRID ASTRID-$TRAVIS_OS_NAME
-- bazel --bazelrc=bazel.travis.rc test //test/... -c opt
+- bazel --bazelrc=bazel.travis.rc test test:all -c opt
 
 
 deploy:
