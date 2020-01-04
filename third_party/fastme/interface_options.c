@@ -35,15 +35,6 @@ Options *chooseSettings (int argc, char **argv)
 
 	Set_Defaults_Input (input);
 
-	if (argc == 1)
-	{
-		// Default values (different from CLI)
-		input->use_NNI		= TRUE;
-		input->use_SPR		= TRUE;
-		input->use_gamma	= TRUE;
-		input->branch		= BrBAL;
-		Get_Input_Interactive (input);
-	}
 
 #ifdef _OPENMP
 	if (input->nb_bootstraps > 0 && input->nb_threads > input->nb_bootstraps)
