@@ -7,7 +7,7 @@ ASTRID-2 is a method for estimating species trees from gene trees.
 
 To build ASTRID-2, clone the git repository, and do the following:
 
-    bazel build
+    bazel build //src:ASTRID -c opt
 
 You can install the bazel build system [here](http://bazel.build). Once the build is complete, your executable will be located at bazel-bin/src/ASTRID.
    
@@ -53,7 +53,9 @@ More command-line options:
 
 
 
-Note that if you are trying to run BioNJ*, you must have the PhyDstar.jar file in the same file as the ASTRID executable.
+Note that if you are trying to run BioNJ*, you need to build a different target:
+
+    bazel build //src:ASTRID-phydstar -c opt
 
 It's possible that FastME with SPR is slow on extremely large datasets, so you can instead do 
 
