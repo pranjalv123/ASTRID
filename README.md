@@ -7,10 +7,9 @@ ASTRID-2 is a method for estimating species trees from gene trees.
 
 To build ASTRID-2, clone the git repository, and do the following:
 
-    mkdir build
-    cd build
-    cmake ../src
-    make
+    bazel build
+
+You can install the bazel build system [here](http://bazel.build). Once the build is complete, your executable will be located at bazel-bin/src/ASTRID.
    
 To run ASTRID-2, you can do
 
