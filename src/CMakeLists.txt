@@ -10,7 +10,7 @@ file(GLOB TEST_SOURCES *.cpp *.c fastme/*.c rapidNJ/src/*.cpp)
 
 list(REMOVE_ITEM TEST_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/astrid.cpp)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}-std=c++14 -g -O4 -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -g -O4 -Wall")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O4 -Wall")
 
 message(WARNING ${JNI_INCLUDE_DIRS})
