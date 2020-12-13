@@ -74,4 +74,4 @@ On moderately large datasets BIONJ* maybe slow; to run on datasets with high lev
 which first runs UPGMA on the matrix with missing data, then fills in the missing elements of the distance matrix with distances from the UPGMA tree.
 It then repeats the process with the FastME-NNI tree, then gives the final result using FastME-SPR.
 
-This is experimental; I expect the accuracy to be superior to that with BIONJ*, but this is unpublished and undertested.
+ASTRID now supports multi-individual gene trees. The matrices corresponding to each gene tree are "collapsed" by averaging the distances between individuals of different species. This technique is described in more detail in ["Species Tree Inference from Gene Splits by Unrooted STAR Methods" by Allman, Degnan, and Rhodes](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5388605/). 
