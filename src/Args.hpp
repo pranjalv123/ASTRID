@@ -19,6 +19,8 @@ struct Args {
 
   std::vector<std::string> java_opts;
   bool stacksize_set = false;
+
+  bool sparse_individual_matrix = false;
   
   Args(int argc, char** argv) {
     constant = 0;
@@ -67,17 +69,21 @@ struct Args {
       }
       else if (arg == "-a" || arg == "--multind") {
         multindfile = argv[i+1];
-	i++;
+	      i++;
       }
       else if (arg == "-h" || arg == "--help") {
         std::cerr << help << std::endl;
-	exit(1);
-      } else if (arg == "-j" || arg == "--java") {
-	java_opts.push_back(argv[i+1]);
-	if (strncmp(argv[i+1], "-Xss", strlen("-Xss")) == 0) {
-	  stacksize_set = true;
-	}
-	i++;
+	      exit(1);
+      } 
+      else if (arg == "-j" || arg == "--java") {
+	      java_opts.push_back(argv[i+1]);
+	      if (strncmp(argv[i+1], "-Xss", strlen("-Xss")) == 0) {
+	        stacksize_set = true;
+	      }
+	      i++;
+      }
+      else if (arg == "--sparse_individual_matrix") {
+        sparse_individual_matrix = true;
       }
       else {
         std::cerr << "Unrecognized argument " << arg << std::endl;

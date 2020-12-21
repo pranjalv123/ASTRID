@@ -21,10 +21,12 @@ cc_binary(
     srcs = [
         "astrid.cpp",
     ],
+    linkopts = ["-lprofiler"],
     deps = [
         ":Args",
         ":Multind",
         ":Octal",
+        ":SparseDistanceMatrix",
         "//src/DistanceMethods:nophydstar",
         "@phylokit",
     ],
@@ -41,6 +43,7 @@ cc_library(
     srcs = ["multind.cpp"],
     hdrs = ["multind.hpp"],
     deps = [
+        ":SparseDistanceMatrix",
         "@boost//:tokenizer",
         "@com_github_google_glog//:glog",
         "@phylokit",
@@ -54,4 +57,14 @@ cc_library(
     deps = [
         "@phylokit",
     ],
+)
+
+cc_library(
+    name = "SparseDistanceMatrix",
+    srcs = ["SparseDistanceMatrix.cpp"],
+    hdrs = ["SparseDistanceMatrix.hpp"],
+    deps = ["@phylokit",
+        "@boost//:algorithm",
+        "@boost//:call_traits",
+        "@boost//:tokenizer",]
 )
