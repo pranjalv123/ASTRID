@@ -49,7 +49,7 @@ file_format IndSpeciesMapping::identify(std::istream& instream) {
 }
 
 void IndSpeciesMapping::load_astral(std::istream& instream) {
-  VLOG(1) << "Loading ASTRAL mapping file";
+
   typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
   boost::char_separator<char> sep(" :,");
   std::string line;
@@ -71,20 +71,20 @@ void IndSpeciesMapping::load_astral(std::istream& instream) {
     
     Taxon species_tax = species_ts.add(temp[0]);
 
-    for (size_t i = 1; i < temp.size(); i++) {
+    for (int i = 1; i < temp.size(); i++) {
       
       if( ! indiv_ts.has(temp[i]) ) {
-	      LOG(ERROR) << "Unrecognized taxon " << temp[i] << " in mapping file" << std::endl;
-	      LOG(ERROR) << "Line " << lineno << ": " <<  line << std::endl;
-	      exit(0);
+	LOG(ERROR) << "Unrecognized taxon " << temp[i] << " in mapping file" << std::endl;
+	LOG(ERROR) << "Line " << lineno << ": " <<  line << std::endl;
+	exit(0);
       }
       
       Taxon indiv_tax   = indiv_ts[temp[i]];    
       
       if (ind_species_map.count(indiv_tax)) {
-	      LOG(ERROR) << "Individual " << temp[i] << " appears twice in mapping file!" << std::endl;
-	      LOG(ERROR) << "Line " << lineno << ": " <<  line << std::endl;
-	      exit(0);
+	LOG(ERROR) << "Individual " << temp[i] << " appears twice in mapping file!" << std::endl;
+	LOG(ERROR) << "Line " << lineno << ": " <<  line << std::endl;
+	exit(0);
       }
 
     
@@ -93,11 +93,10 @@ void IndSpeciesMapping::load_astral(std::istream& instream) {
       
     }
   }
-  VLOG(1) << "Loaded ASTRAL mapping file";
 }
 
 void IndSpeciesMapping::load_astridm(std::istream& instream) {
-  VLOG(1) << "Loading ASTRIDM mapping file";
+
   typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
   boost::char_separator<char> sep(" ");
   std::string line;
@@ -118,7 +117,6 @@ void IndSpeciesMapping::load_astridm(std::istream& instream) {
     }
 
     if( ! indiv_ts.has(temp[0]) ) {
-      continue; // DO NOT SUBMIT
       LOG(ERROR) << "Unrecognized taxon " << temp[0] << " in mapping file" << std::endl;
       LOG(ERROR) << "Line " << lineno << ": " <<  line << std::endl;
       exit(0);
@@ -139,7 +137,7 @@ void IndSpeciesMapping::load_astridm(std::istream& instream) {
     species_ind_map[species_tax].push_back(indiv_tax);    
 
   }
-  VLOG(1) << "Loaded ASTRIDM mapping file";
+  return;
 }
 
 
@@ -150,9 +148,14 @@ void IndSpeciesMapping::load(std::istream& instream) {
     load_astridm(instream);
   }
 
-  VLOG(1) << "ind_species_map has " << ind_species_map.size() << " members";
-  VLOG(1) << "species_ind_map has " << species_ind_map.size() << " members";
+  for (Taxon indiv_tax : indiv_ts) {
+    if (ind_species_map.count(indiv_tax) == 0) {
+      Taxon species_tax = species().add(indiv_ts[indiv_tax]);
 
+      ind_species_map[indiv_tax] = species_tax;
+      species_ind_map[species_tax].push_back(indiv_tax);
+    }
+  }
 }
 
 
@@ -187,53 +190,11 @@ DistanceMatrix IndSpeciesMapping::average(DistanceMatrix& indiv_mat) const {
         }
       }
       if (count_ij == 0) {
-	      species_mat(i_s, j_s) = 0;
-	      species_mat.masked(i_s, j_s) = 0;	
+	species_mat(i_s, j_s) = 0;
+	species_mat.masked(i_s, j_s) = 0;	
       } else {      
-	      species_mat(i_s, j_s) = sum_ij/count_ij;
-	      species_mat.masked(i_s, j_s) = 1;		
-      }
-    }
-  }
-  return species_mat;
-}
-
-DistanceMatrix IndSpeciesMapping::average(SparseDistanceMatrix& indiv_mat) const {
-  DistanceMatrix species_mat(species_ts);
-
-
-  for (const Taxon i : species_ts) {
-    for (const Taxon j : species_ts) {
-      species_mat(i, j) = 0;
-      species_mat.masked(i, j) = 0;
-    }
-  }
-
-  for (auto& entry : indiv_mat) {
-    Taxon i_indiv = entry.first.first;
-    Taxon j_indiv = entry.first.second;
-
-    Taxon i_species = ind_species_map.at(i_indiv);
-    Taxon j_species = ind_species_map.at(j_indiv);
-
-    double distance = entry.second;
-
-    if(i_species == j_species) {
-      species_mat(i_species, j_species) = 0;
-      species_mat.masked(i_species, j_species) = 1;
-      continue;
-    }
-
-    species_mat(i_species, j_species) += distance;
-    species_mat.masked(i_species, j_species) += 1;
-  }
-
-  for (const Taxon i : species_ts) {
-    for (const Taxon j : species_ts) {
-      
-      if (species_mat.masked(i, j) > 0) {
-        species_mat(i, j) /= species_mat.masked(i, j);
-        species_mat.masked(i, j) = 1;
+	species_mat(i_s, j_s) = sum_ij/count_ij;
+	species_mat.masked(i_s, j_s) = 1;		
       }
     }
   }

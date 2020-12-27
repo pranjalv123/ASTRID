@@ -2,7 +2,6 @@
 #include "DistanceMethods/DistanceMethods.hpp"
 #include "multind.hpp"
 #include "octal.hpp"
-#include "SparseDistanceMatrix.hpp"
 #include "phylokit/newick.hpp"
 #include <fstream>
 #include <glog/logging.h>
@@ -23,7 +22,6 @@ TaxonSet get_ts(std::vector<std::string> &newicks) {
   std::unordered_set<std::string> taxa;
   for (std::string n : newicks) {
     newick_to_ts(n, taxa);
-    VLOG_EVERY_N(1, 100) << "Got taxa from " << google::COUNTER << " trees";
   }
   TaxonSet ts(taxa.size());
   for (std::string t : taxa) {
@@ -35,41 +33,37 @@ TaxonSet get_ts(std::vector<std::string> &newicks) {
 DistanceMatrix get_distance_matrix(TaxonSet &ts,
                                    std::vector<std::string> newicks,
                                    std::vector<double> weights,
-                                   IndSpeciesMapping *imap,
-                                   bool sparse) {
+                                   std::vector<Clade> &tree_taxa,
+                                   IndSpeciesMapping *imap) {
 
-  DistanceMatrix result = imap ? DistanceMatrix(imap->species()) : DistanceMatrix(result);
+  DistanceMatrix result(ts);
+  if (imap) {
+    result = DistanceMatrix(imap->species());
+  }
 
   for (size_t i = 0; i < newicks.size(); i++) {
-    LOG(INFO) << "derooting";
     std::string newick_derooted = deroot(newicks[i]);
-    LOG(INFO) << "derooted";
     double w = weights[i];
-    if (sparse && imap) {
-      // use a sparse distance matrix for the individuals
-      LOG(INFO) << "getting sparse dm";
-      SparseDistanceMatrix sdm(ts, newick_derooted);
-      LOG(INFO) << "got it; averaging";
-      result += imap->average(sdm);
-      LOG(INFO) << "averaged";
-    } else{
-      LOG(INFO) << "getting dm";
-      DistanceMatrix dm(ts, newick_derooted);
-      LOG(INFO) << "got it";
-      if (w != 1) {
-        LOG(INFO) << "weighting";
-        dm *= w;
+
+    DistanceMatrix dm(ts, newick_derooted);
+    if (tree_taxa.size() > i) {
+      for (Taxon t1 : ts) {
+        for (Taxon t2 : ts) {
+          if (!(tree_taxa[i].contains(t1) && tree_taxa[i].contains(t2))) {
+            dm(t1, t2) = 0;
+            dm.masked(t1, t2) = 0;
+          }
+        }
       }
-      if (imap) {
-        LOG(INFO) << "averaging";
-        dm = imap->average(dm);
-      }
-      LOG(INFO) << "adding";
-      result += dm;
     }
 
-    VLOG_EVERY_N(1, 1) << "Got " << google::COUNTER << " distance matrices";
-    
+    dm *= w;
+
+    if (imap) {
+      dm = imap->average(dm);
+    }
+
+    result += dm;
   }
 
   for (size_t i = 0; i < ts.size(); i++) {
@@ -84,16 +78,23 @@ DistanceMatrix get_distance_matrix(TaxonSet &ts,
 
 DistanceMatrix get_distance_matrix(TaxonSet &ts,
                                    std::vector<std::string> newicks,
-                                   IndSpeciesMapping *imap,
-                                   bool sparse) {
+                                   IndSpeciesMapping *imap) {
   std::vector<Clade> vc;
   return get_distance_matrix(ts, newicks,
-                             std::vector<double>(newicks.size(), 1), imap, sparse);
+                             std::vector<double>(newicks.size(), 1), vc, imap);
+}
+
+DistanceMatrix get_distance_matrix(TaxonSet &ts,
+                                   std::vector<std::string> newicks,
+                                   std::vector<Clade> &tree_taxa,
+                                   IndSpeciesMapping *imap) {
+  return get_distance_matrix(
+      ts, newicks, std::vector<double>(newicks.size(), 1), tree_taxa, imap);
 }
 
 std::string run_astrid(std::vector<std::string> newicks) { return ""; }
 
-void fill_in(TaxonSet &ts, DistanceMatrix &dm, double cval, bool sparse) {
+void fill_in(TaxonSet &ts, DistanceMatrix &dm, double cval) {
   int count = 0;
   for (size_t i = 0; i < ts.size(); i++) {
     for (size_t j = i; j < ts.size(); j++) {
@@ -107,10 +108,10 @@ void fill_in(TaxonSet &ts, DistanceMatrix &dm, double cval, bool sparse) {
   std::cerr << "Filled in " << count << " elements" << std::endl;
 }
 
-void fill_in(TaxonSet &ts, DistanceMatrix &dm, std::string tree, bool sparse) {
+void fill_in(TaxonSet &ts, DistanceMatrix &dm, std::string tree) {
   std::vector<std::string> trees;
   trees.push_back(tree);
-  DistanceMatrix dm_tree = get_distance_matrix(ts, trees, NULL, sparse);
+  DistanceMatrix dm_tree = get_distance_matrix(ts, trees, NULL);
 
   for (size_t i = 0; i < ts.size(); i++) {
     for (size_t j = i; j < ts.size(); j++) {
@@ -134,9 +135,6 @@ void progressbar(double pct) {
 }
 
 int main(int argc, char **argv) {
-  FLAGS_logtostderr = 1;
-  google::InitGoogleLogging(argv[0]);
-
   Args args(argc, argv);
 
   std::vector<std::string> input_trees;
@@ -151,9 +149,9 @@ int main(int argc, char **argv) {
   }
   LOG(INFO) << "Read " << input_trees.size() << " trees" << std::endl;
 
-  LOG(INFO) << "Getting taxa from trees...";
   TaxonSet ts = get_ts(input_trees);
-  LOG(INFO) << "Found " << ts.size() << " taxa" << std::endl;
+  int iter = 1;
+  std::string tree;
 
   // Set up multi-individual mapping
   IndSpeciesMapping *multind_mapping = nullptr;
@@ -162,10 +160,7 @@ int main(int argc, char **argv) {
     multind_mapping->load(args.multindfile);
   }
 
-  int iter = 1;
-  std::string tree;
-
-  DistanceMatrix dm = get_distance_matrix(ts, input_trees, multind_mapping, args.sparse_individual_matrix);
+  DistanceMatrix dm = get_distance_matrix(ts, input_trees, multind_mapping);
 
   std::cerr << "Estimating tree" << std::endl;
   for (std::string method : args.dms) {
@@ -186,7 +181,7 @@ int main(int argc, char **argv) {
         ss << t;
         completed_trees.push_back(ss.str());
       }
-      dm = get_distance_matrix(ts, input_trees, multind_mapping, args.sparse_individual_matrix);
+      dm = get_distance_matrix(ts, input_trees, multind_mapping);
     }
 
     TaxonSet *species_ts = &ts;
@@ -196,9 +191,9 @@ int main(int argc, char **argv) {
 
     // fill in missing elements on second and later iterations
     if (iter > 1) {
-      fill_in(*species_ts, dm, tree, args.sparse_individual_matrix);
+      fill_in(*species_ts, dm, tree);
     } else if (args.constant != 0) {
-      fill_in(*species_ts, dm, args.constant, args.sparse_individual_matrix);
+      fill_in(*species_ts, dm, args.constant);
     }
 
     if (method == "auto") {
