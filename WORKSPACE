@@ -34,7 +34,7 @@ git_repository(
 
 git_repository(
     name = "phylokit",
-    commit = "aac94d561d24cb747a1e8381ffa2da0a0a0d72b6",
+    commit = "b424df313326fe51e2145f303eced53c65f7b0ab",
     remote = "https://github.com/pranjalv123/phylokit/",
 )
 

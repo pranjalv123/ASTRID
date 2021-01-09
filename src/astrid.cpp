@@ -228,7 +228,7 @@ int main(int argc, char **argv) {
     outfile << tree << std::endl;
     if (args.cache) {
       std::ofstream outfile_cache(args.cachefile + "." + std::to_string(iter));
-      outfile_cache << dm.str();
+      dm.writePhylip(outfile_cache);
     }
     iter++;
   }
