@@ -11,7 +11,9 @@ struct Args {
   std::string infile;
   std::string outfile;
   std::string multindfile;
-  
+  std::string cachefile;
+  bool cache;
+
   double constant;
   std::vector<std::string> dms;
 
@@ -23,6 +25,7 @@ struct Args {
   Args(int argc, char** argv) {
     constant = 0;
     octal = false;
+    cache = false;
     for (int i = 1; i < argc; i++) {
       std::string arg(argv[i]);
       if (arg == "-i" || arg == "--input") {
@@ -55,6 +58,11 @@ struct Args {
       }
       else if (arg == "--bionj") {
         dms.push_back("bionj");
+      }
+      else if (arg == "--cache") {
+        cachefile = argv[i+1];
+        cache = true;
+        i++;
       }
 
       else if (arg == "-x") {

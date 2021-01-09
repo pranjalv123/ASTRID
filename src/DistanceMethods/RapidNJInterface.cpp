@@ -37,7 +37,7 @@ std::string RapidNJ(TaxonSet &ts, DistanceMatrix &dm) {
       dmreader_verbose, matrixSize, halfMatrix, &sequenceNames, matrix);
 
   ProgressBar pb;
-  rapidNJ rnj(reader, matrixSize, false, &pb);
+  rapidNJ rnj(reader, matrixSize, false /* negative_branches */, &pb);
   polytree *tree = rnj.run();
 
   std::stringstream out;

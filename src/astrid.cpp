@@ -226,6 +226,10 @@ int main(int argc, char **argv) {
 
     std::ofstream outfile(args.outfile + "." + std::to_string(iter));
     outfile << tree << std::endl;
+    if (args.cache) {
+      std::ofstream outfile_cache(args.cachefile + "." + std::to_string(iter));
+      outfile_cache << dm.str();
+    }
     iter++;
   }
   std::ofstream outfile(args.outfile);
