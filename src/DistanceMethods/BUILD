@@ -87,4 +87,5 @@ cc_library(
     name = "whereami",
     srcs = ["whereami.c"],
     hdrs = ["whereami.h"],
+    copts=["-std=c99"]
 )
