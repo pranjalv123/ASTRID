@@ -70,6 +70,7 @@ cc_library(
         "//:jni_headers",
         "@phylokit",
     ],
+    linkopts =["-ldl"]
 )
 
 cc_library(

@@ -19,8 +19,8 @@ std::string mydir() {
   return dir;
 }
 
-void write_matrix(TaxonSet& ts, DistanceMatrix& dm, ostream& os) {
-  os << ts.size() << endl;
+void write_matrix(TaxonSet& ts, DistanceMatrix& dm, std::ostream& os) {
+  os << ts.size() << std::endl;
   for (size_t i = 0; i < ts.size(); i++) {
     os << i << " ";
     for (size_t j = 0; j < ts.size(); j++) {
@@ -44,7 +44,7 @@ void runPhyDStar(std::string method, std::string tempfilename, std::vector<std::
 
   std::string opt_classpath = "-Djava.class.path=" + mydir() + "/PhyDstar.jar";
   options[0].optionString = &(opt_classpath[0]);  
-  for (int i = 0; i < java_opts.size(); i++) {
+  for (size_t i = 0; i < java_opts.size(); i++) {
     options[i+1].optionString = &(java_opts[i][0]);
   }
   vm_args.version = JNI_VERSION_1_6;
@@ -77,7 +77,7 @@ void runPhyDStar(std::string method, std::string tempfilename, std::vector<std::
 
 }
 
-std::string BioNJStar(TaxonSet& ts, DistanceMatrix& dm, vector<std::string>& java_opts) {
+std::string BioNJStar(TaxonSet& ts, DistanceMatrix& dm, std::vector<std::string>& java_opts) {
 
   std::string fname = tmpnam(0);
   
