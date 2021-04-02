@@ -164,24 +164,6 @@ int main(int argc, char **argv) {
   for (std::string method : args.dms) {
     std::cerr << "Running " << method << std::endl;
 
-    // OCTAL completion of trees with missing data
-    if (tree.size() && args.octal) {
-
-      std::vector<std::string> completed_trees;
-      std::vector<Clade> tree_taxa;
-      Tree T = newick_to_treeclades(tree, ts);
-      for (std::string t_s : input_trees) {
-        Tree t = newick_to_treeclades(t_s, ts);
-        tree_taxa.push_back(t.taxa());
-
-        octal_complete(T, t);
-        std::stringstream ss;
-        ss << t;
-        completed_trees.push_back(ss.str());
-      }
-      dm = get_distance_matrix(ts, input_trees, multind_mapping);
-    }
-
     TaxonSet *species_ts = &ts;
     if (multind_mapping) {
       species_ts = &(multind_mapping->species());
