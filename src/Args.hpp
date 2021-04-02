@@ -106,7 +106,10 @@ struct Args {
     }
 
     if (dms.empty()) {
-      dms.push_back("auto");
+      // by default, we use UPGMA*, then FastME+NNIs, then FastME+SPRs
+      dms.push_back("upgma");
+      dms.push_back("fastme_nni");
+      dms.push_back("fastme_spr");
     }
   }
   
