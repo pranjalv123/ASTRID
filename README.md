@@ -19,8 +19,9 @@ to run ASTRID with the BME criterion in FastME, with SPR local search (if the di
 
 More command-line options:
 
-    -i --input       Specify input file. Should contain one tree per line, in Newick format.
-    -o --output      Specify output file (default is infile.astrid). Will contain one output tree, in Newick format. The tree may have branch lengths, depending on the distance method used, but these are not meaningful
+    -i --input <filename>       Specify input file. Should contain one tree per line, in Newick format.
+    -o --output <filename>      Specify output file (default is infile.astrid). Will contain one output tree, in Newick format. The tree may have branch lengths, depending on the distance method used, but these are not meaningful
+    --cache <filename>          Output the distance matrix. This is useful if you want to run a different distance method.  
 
     [Distance method selection]
     -u       Use UPGMA as distance method for tree estimation
@@ -29,7 +30,6 @@ More command-line options:
     -s       Use FastME with NNIs and SPRs for local search as distance method for tree estimation
     --bionj          Use BioNJ* with as distance method for tree estimation (make sure PhyDstar.jar is in the same folder as the ASTRID executable)
     --auto   [default] Automatically choose between --bionj and -s depending on if the distance matrix is missing taxa
-
 
     [Multiple individuals]
     -a --multind     [experimental] Specify mapping file for multiple-individual datasets. Can be in one of three formats, which will be auto-detected:
