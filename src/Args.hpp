@@ -17,14 +17,11 @@ struct Args {
   double constant;
   std::vector<std::string> dms;
 
-  bool octal;
-
   std::vector<std::string> java_opts;
   bool stacksize_set = false;
   
   Args(int argc, char** argv) {
     constant = 0;
-    octal = false;
     cache = false;
     for (int i = 1; i < argc; i++) {
       std::string arg(argv[i]);
@@ -70,9 +67,6 @@ struct Args {
         i++;
       }
 
-      else if (arg == "-c") {
-        octal=true;
-      }
       else if (arg == "-a" || arg == "--multind") {
         multindfile = argv[i+1];
 	i++;
