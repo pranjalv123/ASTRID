@@ -92,9 +92,7 @@ DistanceMatrix get_distance_matrix(TaxonSet &ts,
       ts, newicks, std::vector<double>(newicks.size(), 1), tree_taxa, imap);
 }
 
-std::string run_astrid(std::vector<std::string> newicks) { return ""; }
-
-void fill_in(TaxonSet &ts, DistanceMatrix &dm, double cval) {
+void fill_in_const(TaxonSet &ts, DistanceMatrix &dm, double cval) {
   int count = 0;
   for (size_t i = 0; i < ts.size(); i++) {
     for (size_t j = i; j < ts.size(); j++) {
@@ -193,24 +191,10 @@ int main(int argc, char **argv) {
     if (iter > 1) {
       fill_in(*species_ts, dm, tree);
     } else if (args.constant != 0) {
-      fill_in(*species_ts, dm, args.constant);
+      fill_in_const(*species_ts, dm, args.constant);
     }
-
-    if (method == "auto") {
-      if (has_missing(*species_ts, dm)) {
-        std::cerr << "Missing entries in distance matrix, trying to run BioNJ*"
-                  << std::endl;
-        std::cerr << "You may have better results adding -u -s to your command "
-                     "line to use UPGMA completion instead."
-                  << std::endl;
-        tree = BioNJStar(*species_ts, dm, args.java_opts);
-      } else {
-        std::cerr
-            << "No missing entries in distance matrix, running FastME2+SPR"
-            << std::endl;
-        tree = FastME(*species_ts, dm, 1, 1);
-      }
-    } else if (method == "upgma") {
+    
+    if (method == "upgma") {
       tree = UPGMA(*species_ts, dm);
     } else if (method == "fastme") {
       tree = FastME(*species_ts, dm, 0, 0);
