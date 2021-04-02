@@ -5,7 +5,6 @@ language: c++
 os:
 - linux
 - osx
-- windows
 env:
 - V=1.2.1
 before_install:
@@ -34,8 +33,6 @@ before_install:
 script:
 - bazel --bazelrc=bazel.travis.rc build src:ASTRID -c opt
 - cp bazel-bin/src/ASTRID ASTRID-$TRAVIS_OS_NAME
-- bazel --bazelrc=bazel.travis.rc build src:ASTRID-phydstar -c opt
-- cp bazel-bin/src/ASTRID ASTRID-phydstar-$TRAVIS_OS_NAME
 - bazel --bazelrc=bazel.travis.rc test test:all -c opt
 
 
