@@ -41,8 +41,6 @@ TEST_CASE("ARGS") {
   REQUIRE(args.dms[1] == "fastme");
   REQUIRE(args.dms[2] == "fastme_nni");
   REQUIRE(args.dms[3] == "fastme_spr");
-
-  REQUIRE(!args.octal);
   
 }
 
