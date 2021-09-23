@@ -15,7 +15,7 @@ To run ASTRID-2, you can do
 
     ASTRID -i <input gene trees> -o <output species tree>
     
-to run ASTRID with the BME criterion in FastME, with SPR local search (if the distance matrix is complete) or with BioNJ* (if the distance matrix is incomplete).
+to run ASTRID with the BME criterion in FastME, with SPR local search (if the distance matrix is complete), first completing the tree with UPGMA* if needed.
 
 More command-line options:
 
@@ -53,7 +53,8 @@ More command-line options:
 
 
 
-Note that if you are trying to run BioNJ*, you need to build a different target:
+Note that if you are trying to run BioNJ*, you need to build a different target. 
+THIS IS NOT RECOMMENDED AND IS ONLY INCLUDED FOR HISTORICAL REASONS.
 
     bazel build //src:ASTRID-phydstar -c opt
 
