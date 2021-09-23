@@ -45,10 +45,7 @@ jobs:
 
     - name: Install bazelisk
       run: |
-        curl -LO "https://github.com/bazelbuild/bazelisk/releases/download/v1.1.0/bazelisk-darwin"
-        mkdir -p "${GITHUB_WORKSPACE}/bin/"
-        mv bazelisk-darwin "${GITHUB_WORKSPACE}/bin/bazel"
-        chmod +x "${GITHUB_WORKSPACE}/bin/bazel"
+        "brew install bazelisk"
 
     - name: Test
       run: |
