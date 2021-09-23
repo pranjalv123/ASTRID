@@ -92,13 +92,14 @@ DistanceMatrix get_distance_matrix(TaxonSet &ts,
       ts, newicks, std::vector<double>(newicks.size(), 1), tree_taxa, imap);
 }
 
-void fill_in_const(TaxonSet &ts, DistanceMatrix &dm, double cval) {
+void fill_in_const(DistanceMatrix& output, TaxonSet &ts,
+                  const DistanceMatrix &dm, double cval) {
   int count = 0;
   for (size_t i = 0; i < ts.size(); i++) {
     for (size_t j = i; j < ts.size(); j++) {
       if (!dm.has(i, j)) {
-        dm(i, j) = cval;
-        dm.masked(i, j) = 1;
+        output(i, j) = cval;
+        output.masked(i, j) = 1;
         count++;
       }
     }
@@ -106,7 +107,8 @@ void fill_in_const(TaxonSet &ts, DistanceMatrix &dm, double cval) {
   std::cerr << "Filled in " << count << " elements" << std::endl;
 }
 
-void fill_in(TaxonSet &ts, DistanceMatrix &dm, std::string tree) {
+void fill_in(DistanceMatrix &output, TaxonSet &ts, 
+             const DistanceMatrix &dm, std::string tree) {
   std::vector<std::string> trees;
   trees.push_back(tree);
   DistanceMatrix dm_tree = get_distance_matrix(ts, trees, NULL);
@@ -114,8 +116,8 @@ void fill_in(TaxonSet &ts, DistanceMatrix &dm, std::string tree) {
   for (size_t i = 0; i < ts.size(); i++) {
     for (size_t j = i; j < ts.size(); j++) {
       if (!dm.has(i, j)) {
-        dm(i, j) = dm_tree(i, j);
-        dm.masked(i, j) = 1;
+        output(i, j) = dm_tree(i, j);
+        output.masked(i, j) = 1;
       }
     }
   }
@@ -164,34 +166,57 @@ int main(int argc, char **argv) {
   for (std::string method : args.dms) {
     std::cerr << "Running " << method << std::endl;
 
+    // OCTAL completion of trees with missing data
+    if (tree.size() && args.octal) {
+
+      std::vector<std::string> completed_trees;
+      std::vector<Clade> tree_taxa;
+      Tree T = newick_to_treeclades(tree, ts);
+      for (std::string t_s : input_trees) {
+        Tree t = newick_to_treeclades(t_s, ts);
+        tree_taxa.push_back(t.taxa());
+
+        octal_complete(T, t);
+        std::stringstream ss;
+        ss << t;
+        completed_trees.push_back(ss.str());
+      }
+      dm = get_distance_matrix(ts, input_trees, multind_mapping);
+    }
+
     TaxonSet *species_ts = &ts;
     if (multind_mapping) {
       species_ts = &(multind_mapping->species());
     }
 
+    bool missing = has_missing(ts, dm);
+    DistanceMatrix *filledDM = &dm;
     // fill in missing elements on second and later iterations
-    if (iter > 1) {
-      fill_in(*species_ts, dm, tree);
+    if (iter > 1 && missing) {
+      filledDM = new DistanceMatrix(ts);
+      fill_in(*filledDM, *species_ts, dm, tree);
     } else if (args.constant != 0) {
-      fill_in_const(*species_ts, dm, args.constant);
+      filledDM = new DistanceMatrix(ts);
+      fill_in_const(*filledDM, *species_ts, dm, args.constant);
     }
     
     if (method == "upgma") {
-      tree = UPGMA(*species_ts, dm);
+      tree = UPGMA(*species_ts, *filledDM);
     } else if (method == "fastme") {
-      tree = FastME(*species_ts, dm, 0, 0);
+      tree = FastME(*species_ts, *filledDM, 0, 0);
     } else if (method == "fastme_nni") {
-      tree = FastME(*species_ts, dm, 1, 0);
+      tree = FastME(*species_ts, *filledDM, 1, 0);
     } else if (method == "fastme_spr") {
-      tree = FastME(*species_ts, dm, 1, 1);
+      tree = FastME(*species_ts, *filledDM, 1, 1);
     }
 
     std::ofstream outfile(args.outfile + "." + std::to_string(iter));
     outfile << tree << std::endl;
     if (args.cache) {
       std::ofstream outfile_cache(args.cachefile + "." + std::to_string(iter));
-      dm.writePhylip(outfile_cache);
+      filledDM->writePhylip(outfile_cache);
     }
+    delete filledDM;
     iter++;
   }
   std::ofstream outfile(args.outfile);
