@@ -31,12 +31,13 @@ jobs:
       run: |
         "${GITHUB_WORKSPACE}/bin/bazel" build //src:ASTRID
         mv bazel-bin/src/ASTRID bazel-bin/src/ASTRID-linux
+        
     - name: Release
       uses: marvinpinto/action-automatic-releases@latest
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: "latest"
-        title: "Automatic Build"
+        title: "Linux Latest Release"
         files: |
           README.md
           bazel-bin/src/ASTRID-linux
@@ -72,7 +73,7 @@ jobs:
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: "latest"
-        title: "Automatic Build"
+        title: "MacOS Latest Release"
         files: |
           README.md
           bazel-bin/src/ASTRID-macos
