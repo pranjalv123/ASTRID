@@ -45,12 +45,13 @@ jobs:
 
     - name: Install bazelisk
       run: |
-        "brew install bazelisk"
+        brew update
+        brew install bazelisk
 
     - name: Test
       run: |
-        "${GITHUB_WORKSPACE}/bin/bazel" test //...
+        bazel test //...
 
     - name: Build
       run: |
-        "${GITHUB_WORKSPACE}/bin/bazel" build //...
+        bazel build //...
