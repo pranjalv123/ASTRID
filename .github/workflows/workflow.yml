@@ -32,14 +32,14 @@ jobs:
         "${GITHUB_WORKSPACE}/bin/bazel" build //...
 
     - name: Release
-      uses: "marvinpinto/action-automatic-releases@latest"
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "latest"
-          title: "Automatic Build"
-          files: |
-            README.md
-            bazel-bin/src/ASTRID
+      uses: marvinpinto/action-automatic-releases@latest
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "latest"
+        title: "Automatic Build"
+        files: |
+          README.md
+          bazel-bin/src/ASTRID
 
   build-mac:
     runs-on: macos-11
@@ -67,11 +67,11 @@ jobs:
         bazel build //src/ASTRID
 
     - name: Release
-      uses: "marvinpinto/action-automatic-releases@latest"
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "latest"
-          title: "Automatic Build"
-          files: |
-            README.md
-            bazel-bin/src/ASTRID
+      uses: marvinpinto/action-automatic-releases@latest
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "latest"
+        title: "Automatic Build"
+        files: |
+          README.md
+          bazel-bin/src/ASTRID
