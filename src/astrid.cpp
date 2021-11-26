@@ -191,13 +191,16 @@ int main(int argc, char **argv) {
 
     bool missing = has_missing(ts, dm);
     DistanceMatrix *filledDM = &dm;
+    bool delete_filledDM = false;
     // fill in missing elements on second and later iterations
     if (iter > 1 && missing) {
       filledDM = new DistanceMatrix(ts);
       fill_in(*filledDM, *species_ts, dm, tree);
+      delete_filledDM = true;
     } else if (args.constant != 0) {
       filledDM = new DistanceMatrix(ts);
       fill_in_const(*filledDM, *species_ts, dm, args.constant);
+      delete_filledDM = true;
     }
     
     if (method == "upgma") {
@@ -216,7 +219,9 @@ int main(int argc, char **argv) {
       std::ofstream outfile_cache(args.cachefile + "." + std::to_string(iter));
       filledDM->writePhylip(outfile_cache);
     }
-    delete filledDM;
+    if (delete_filledDM) {
+      delete filledDM;
+    }
     iter++;
   }
   std::ofstream outfile(args.outfile);
