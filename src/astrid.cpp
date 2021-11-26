@@ -208,10 +208,6 @@ int main(int argc, char **argv) {
       tree = FastME(*species_ts, *filledDM, 1, 0);
     } else if (method == "fastme_spr") {
       tree = FastME(*species_ts, *filledDM, 1, 1);
-    } else if (method == "bionj") {
-      tree = BioNJStar(*species_ts, *filledDM, args.java_opts);
-    } else if (method == "rapidnj") {
-      tree = RapidNJ(*species_ts, *filledDM);
     }
 
     std::ofstream outfile(args.outfile + "." + std::to_string(iter));
