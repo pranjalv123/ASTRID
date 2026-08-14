@@ -5,15 +5,23 @@ This repository is under development, and there may be some changes to the user 
 
 ASTRID-2 is a method for estimating species trees from gene trees. 
 
+## Build
+
 To build ASTRID-2, clone the git repository, and do the following:
 
-    bazel build //src:ASTRID -c opt
+```sh
+bazel build //src:ASTRID -c opt
+```
 
 You can install the bazel build system [here](http://bazel.build). Once the build is complete, your executable will be located at bazel-bin/src/ASTRID.
-   
+
+## Quick start
+
 To run ASTRID-2, you can do
 
-    ASTRID -i <input gene trees> -o <output species tree>
+```sh
+ASTRID -i <input gene trees> -o <output species tree>
+```
     
 to run ASTRID with the BME criterion in FastME, with SPR local search (if the distance matrix is complete), first completing the tree with UPGMA* if needed.
 
