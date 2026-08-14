@@ -2,6 +2,8 @@
 
 This repository is under development, and there may be some changes to the user interface in the future.
 
+This README was updated as a simple test change.
+
 
 ASTRID-2 is a method for estimating species trees from gene trees. 
 
