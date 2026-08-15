@@ -9,7 +9,7 @@ To build ASTRID-2, clone the git repository, and do the following:
 
     bazel build //src:ASTRID -c opt
 
-You can install the bazel build system [here](http://bazel.build). Once the build is complete, your executable will be located at bazel-bin/src/ASTRID.
+You can install the Bazel build system [here](https://bazel.build). Once the build is complete, run the executable from the repository root with `./bazel-bin/src/ASTRID`.
    
 To run ASTRID-2, you can do
 
