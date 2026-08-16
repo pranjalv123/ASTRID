@@ -1,0 +1,6 @@
+version: 1
+rules:
+  - id: customization-e2e
+    files: [".agents/skills/reviewbuddy-customization-probe/SKILL.md"]
+    condition: ""
+    skill: reviewbuddy-customization-probe
