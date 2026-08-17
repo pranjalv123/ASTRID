@@ -1,0 +1,6 @@
+version: 1
+rules:
+  - id: astrid-review-proof
+    files: ["reviewbuddy-proof.txt"]
+    condition: ""
+    skill: astrid-review-proof
